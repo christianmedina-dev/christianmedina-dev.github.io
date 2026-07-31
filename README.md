@@ -10,7 +10,7 @@ A bilingual (ES/EN) one-page portfolio: background, experience, selected project
 
 - `index.html` — main page
 - `ensayo.html` — technical essay: *Cloud cost is not an invoice, it is a design decision*
-- `cv/` — résumé (PDF)
+- `cv/` — resumé (PDF)
 
 ## Stack
 
