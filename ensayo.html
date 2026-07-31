@@ -25,6 +25,21 @@ body{margin:0;background:#f5f3ee;color:#16150f;-webkit-font-smoothing:antialiase
 a{color:#16150f;text-decoration:none}
 a:hover{color:#e51a0d}
 ::selection{background:#e51a0d;color:#f5f3ee}
+@media (max-width:760px){
+  main{padding:0 20px !important}
+  header>div{padding:13px 20px !important;gap:12px !important}
+  header nav,header>div>div{gap:14px !important}
+  main>section:first-of-type{padding:64px 0 56px !important;grid-template-columns:1fr !important;gap:30px !important}
+  section[style*="grid-template-columns:150px"]{grid-template-columns:1fr !important;gap:14px !important;padding-top:48px !important;padding-bottom:56px !important}
+  div[style*="grid-template-columns:132px"],div[style*="grid-template-columns:150px 1fr"]{grid-template-columns:1fr !important;gap:2px !important}
+  li[style*="grid-template-columns:16px"]{grid-template-columns:14px 1fr !important}
+  h1{font-size:clamp(34px,10vw,46px) !important}
+  a[style*="padding:14px"]{flex:1 1 auto;justify-content:center;text-align:center;min-height:44px;display:inline-flex !important;align-items:center}
+  footer{flex-direction:column !important;gap:8px !important}
+}
+@media (max-width:420px){
+  div[style*="grid-template-columns:repeat(2,1fr)"]{grid-template-columns:1fr !important}
+}
 @keyframes cmRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
 </style></helmet>
 
