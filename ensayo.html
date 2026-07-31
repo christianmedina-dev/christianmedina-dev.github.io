@@ -40,6 +40,19 @@ a:hover{color:#e51a0d}
 @media (max-width:420px){
   div[style*="grid-template-columns:repeat(2,1fr)"]{grid-template-columns:1fr !important}
 }
+html,body{max-width:100%;overflow-x:hidden}
+*{min-width:0}
+@media (max-width:760px){
+  [style*="max-width:1080px"]{padding-left:20px !important;padding-right:20px !important}
+  [style*="display:grid"]{grid-template-columns:1fr !important}
+  li[style*="grid-template-columns:16px"]{grid-template-columns:14px 1fr !important}
+  [style*="white-space:nowrap"]{white-space:normal !important}
+  [style*="max-width:640px"],[style*="max-width:580px"],[style*="max-width:430px"],[style*="width:176px"]{max-width:100% !important}
+  [style*="width:176px"]{width:100% !important;max-width:220px !important}
+  [data-parallax]{transform:none !important}
+  h1{font-size:clamp(32px,9vw,44px) !important;word-break:break-word}
+  footer{flex-direction:column !important;align-items:flex-start !important}
+}
 @keyframes cmRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
 </style></helmet>
 
