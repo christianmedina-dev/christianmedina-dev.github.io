@@ -377,6 +377,7 @@ class Component extends DCLogic {
       document.querySelectorAll('[data-parallax]').forEach(el => {
         el.style.transform = 'translate3d(0,' + (y * parseFloat(el.dataset.parallax)).toFixed(2) + 'px,0)';
       });
+      if (this.sweep) this.sweep();
     };
     window.addEventListener('scroll', this.onScroll, { passive: true });
     this.setupMotion();
@@ -402,22 +403,48 @@ class Component extends DCLogic {
       el.style.animation = 'cmRise .95s cubic-bezier(.2,.8,.2,1) both';
       el.style.animationDelay = (parseInt(el.dataset.anim, 10) * 0.09) + 's';
     });
-    if (this.io) this.io.disconnect();
-    this.io = new IntersectionObserver(entries => {
+    if (this.io) { this.io.disconnect(); this.io = null; }
+
+    const show = el => {
+      el.dataset.revealed = '1';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    };
+    const inView = el => {
+      const r = el.getBoundingClientRect();
+      return r.top < window.innerHeight * 0.95 && r.bottom > -40;
+    };
+    const els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
+
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      els.forEach(show);
+      this.sweep = null;
+      requestAnimationFrame(() => this.onScroll && this.onScroll());
+      return;
+    }
+
+    const io = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (!e.isIntersecting) return;
-        e.target.style.opacity = '1';
-        e.target.style.transform = 'none';
-        this.io.unobserve(e.target);
+        show(e.target);
+        io.unobserve(e.target);
       });
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.05 });
-    document.querySelectorAll('[data-reveal]').forEach((el, i) => {
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
+    this.io = io;
+
+    els.forEach((el, i) => {
+      if (el.dataset.revealed || inView(el)) { show(el); return; }
       el.style.opacity = '0';
       el.style.transform = 'translateY(22px)';
       el.style.transition = ease;
       el.style.transitionDelay = ((i % 4) * 0.07) + 's';
-      this.io.observe(el);
+      io.observe(el);
     });
+
+    // red de seguridad: si el observer falla, nada queda invisible
+    this.sweep = () => els.forEach(el => { if (!el.dataset.revealed && inView(el)) show(el); });
+    setTimeout(() => this.sweep && this.sweep(), 1200);
     requestAnimationFrame(() => this.onScroll && this.onScroll());
   }
 
