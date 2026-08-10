@@ -2,438 +2,531 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>El costo en la nube es una decisión de diseño — Christian J. Medina Díaz</title>
 <meta name="description" content="Ensayo técnico sobre volcado completo vs. refresco incremental: por qué la forma en que un pipeline trae los datos determina lo que cuesta operarlo.">
 <meta name="author" content="Christian J. Medina Díaz">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="El costo en la nube es una decisión de diseño — Christian J. Medina Díaz">
-<meta property="og:description" content="Ensayo técnico sobre volcado completo vs. refresco incremental: por qué la forma en que un pipeline trae los datos determina lo que cuesta operarlo.">
-<meta property="og:url" content="https://christianmedina-dev.github.io/">
-<meta name="twitter:card" content="summary">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet data-dc-atomics>
+<meta property="og:description" content="Ensayo técnico sobre volcado completo vs. refresco incremental y diseño de pipelines de datos.">
+<meta property="og:url" content="https://christianmedina-dev.github.io/ensayo.html">
+<meta property="og:image" content="https://christianmedina-dev.github.io/preview-cream.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://christianmedina-dev.github.io/preview-cream.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+:root{
+  --bg:#F1EDE3;
+  --ink:#16150f;
+  --accent:#e51a0d;
+  --muted:rgba(22,21,15,.70);
+  --soft:rgba(22,21,15,.45);
+  --line:rgba(22,21,15,.14);
+  --page:1080px;
+  --copy:640px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
-body{margin:0;background:#f5f3ee;color:#16150f;-webkit-font-smoothing:antialiased}
-a{color:#16150f;text-decoration:none}
-a:hover{color:#e51a0d}
-::selection{background:#e51a0d;color:#f5f3ee}
-@media (max-width:760px){
-  main{padding:0 20px !important}
-  header>div{padding:13px 20px !important;gap:12px !important}
-  header nav,header>div>div{gap:14px !important}
-  main>section:first-of-type{padding:64px 0 56px !important;grid-template-columns:1fr !important;gap:30px !important}
-  section[style*="grid-template-columns:150px"]{grid-template-columns:1fr !important;gap:14px !important;padding-top:48px !important;padding-bottom:56px !important}
-  div[style*="grid-template-columns:132px"],div[style*="grid-template-columns:150px 1fr"]{grid-template-columns:1fr !important;gap:2px !important}
-  li[style*="grid-template-columns:16px"]{grid-template-columns:14px 1fr !important}
-  h1{font-size:clamp(34px,10vw,46px) !important}
-  a[style*="padding:14px"]{flex:1 1 auto;justify-content:center;text-align:center;min-height:44px;display:inline-flex !important;align-items:center}
-  footer{flex-direction:column !important;gap:8px !important}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'IBM Plex Mono',ui-monospace,monospace;
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
 }
-@media (max-width:420px){
-  div[style*="grid-template-columns:repeat(2,1fr)"]{grid-template-columns:1fr !important}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+::selection{background:var(--accent);color:var(--bg)}
+.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:100}
+
+.header{
+  position:sticky;top:0;z-index:90;
+  padding-top:env(safe-area-inset-top);
+  background:rgba(241,237,227,.94);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(22,21,15,.12)
 }
-html,body{max-width:100%;overflow-x:hidden}
-*{min-width:0}
-@media (max-width:760px){
-  [style*="max-width:1080px"]{padding-left:20px !important;padding-right:20px !important}
-  [style*="display:grid"]{grid-template-columns:1fr !important}
-  li[style*="grid-template-columns:16px"]{grid-template-columns:14px 1fr !important}
-  [style*="white-space:nowrap"]{white-space:normal !important}
-  [style*="max-width:640px"],[style*="max-width:580px"],[style*="max-width:430px"],[style*="width:176px"]{max-width:100% !important}
-  [style*="width:176px"]{width:100% !important;max-width:220px !important}
-  [data-parallax]{transform:none !important}
-  h1{font-size:clamp(32px,9vw,44px) !important;word-break:break-word}
-  footer{flex-direction:column !important;align-items:flex-start !important}
+.header-inner{
+  max-width:var(--page);margin:0 auto;padding:17px 40px;
+  display:flex;justify-content:space-between;align-items:center;gap:24px
 }
-@keyframes cmRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-</style></helmet>
+.back{
+  display:flex;align-items:center;gap:9px;
+  font:500 11px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.16em;text-transform:uppercase
+}
+.back span{color:var(--accent)}
+.lang{display:flex;gap:10px}
+.lang button{
+  border:0;background:none;padding:0;cursor:pointer;
+  font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em
+}
 
-<div style="min-height:100vh;background:#f5f3ee;font-family:'IBM Plex Mono',ui-monospace,monospace;overflow-x:hidden">
+main{max-width:var(--page);margin:0 auto;padding:0 40px}
+.hero{
+  max-width:760px;padding:96px 0 56px;
+  border-bottom:1px solid var(--line)
+}
+.eyebrow{
+  margin-bottom:28px;color:var(--accent);
+  font:500 11px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.18em;text-transform:uppercase
+}
+.hero h1{
+  margin:0;
+  font:400 clamp(38px,5.6vw,66px)/1.03 'Instrument Serif',Georgia,serif;
+  letter-spacing:-.012em
+}
+.hero-copy{
+  margin:32px 0 0;max-width:580px;
+  font:400 15px/1.85 'IBM Plex Mono',monospace;color:var(--muted)
+}
+.meta{
+  display:flex;flex-wrap:wrap;gap:28px;margin-top:40px;
+  font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5)
+}
 
-  <div ref="{{ bar }}" style="position:fixed;top:0;left:0;height:2px;width:0;background:#e51a0d;z-index:60"></div>
+.article-section{
+  border-top:1px solid var(--line);
+  padding:60px 0 66px;
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:40px
+}
+.article-section.first{border-top:0}
+.section-label{
+  color:var(--soft);
+  font:500 10px/1.6 'IBM Plex Mono',monospace;
+  letter-spacing:.16em;text-transform:uppercase
+}
+.copy{max-width:var(--copy)}
+.copy p{
+  margin:20px 0 0;
+  font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72)
+}
+.copy p:first-child{margin-top:0}
+.copy .lead{
+  font:400 clamp(21px,2.5vw,28px)/1.45 'Instrument Serif',Georgia,serif;
+  color:var(--ink)
+}
+.bullets{
+  margin:20px 0 0;padding:0;list-style:none;
+  display:flex;flex-direction:column;gap:11px;
+  font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)
+}
+.bullets li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:4px}
+.dash{color:var(--accent)}
+.quote{
+  margin-top:32px;padding:22px 24px;border-left:2px solid var(--accent);
+  background:rgba(22,21,15,.03)
+}
+.quote p{
+  margin:0!important;
+  font:400 clamp(18px,2.2vw,23px)/1.5 'Instrument Serif',Georgia,serif!important;
+  color:var(--ink)!important
+}
+.compare{
+  margin-top:36px;border:1px solid var(--line)
+}
+.compare-title{
+  padding:16px 20px;border-bottom:1px solid var(--line);
+  font:500 10px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,15,.5)
+}
+.compare-title.alt{border-top:1px solid var(--line);background:rgba(22,21,15,.03)}
+.compare-body{padding:22px 20px;display:flex;flex-direction:column;gap:9px}
+.compare-body.alt{background:rgba(22,21,15,.03)}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{width:78px;flex:0 0 78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:var(--soft)}
+.bar{height:14px;background:rgba(229,26,13,.85)}
+.bar.full{width:100%}
+.bar.initial{width:100%;background:rgba(22,21,15,.32)}
+.bar.small7{width:7%}
+.bar.small5{width:5%}
+.compare-note{margin-top:4px;font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5)}
 
-  <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(245,243,238,.82);border-bottom:1px solid rgba(22,21,15,.12)">
-    <div style="max-width:1080px;margin:0 auto;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;gap:24px">
-      <a href="index.html" style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:9px"><span style="color:#e51a0d">←</span>{{ backLabel }}</a>
-      <div style="display:flex;gap:9px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em">
-        <button onClick="{{ setEs }}" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:{{ cEs }};text-decoration:underline;text-underline-offset:4px;text-decoration-color:{{ uEs }}">ES</button>
-        <button onClick="{{ setEn }}" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:{{ cEn }};text-decoration:underline;text-underline-offset:4px;text-decoration-color:{{ uEn }}">EN</button>
+.paths,.change-list{margin-top:22px}
+.path{
+  padding:20px 0;border-top:1px solid rgba(22,21,15,.12)
+}
+.path:last-child{border-bottom:1px solid rgba(22,21,15,.12)}
+.path-title{font:400 18px/1.35 'Instrument Serif',Georgia,serif}
+.path-title.good{color:var(--accent)}
+.path p{margin:7px 0 0!important;font-size:12.5px!important;line-height:1.75!important;color:rgba(22,21,15,.62)!important}
+.change-row{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;
+  padding:17px 0;border-top:1px solid rgba(22,21,15,.12);
+  font:400 13px/1.7 'IBM Plex Mono',monospace
+}
+.change-row:last-child{border-bottom:1px solid rgba(22,21,15,.12)}
+.change-row span:first-child{color:var(--soft)}
+
+.note{
+  border-top:1px solid var(--line);padding:26px 0 0;
+  max-width:640px;
+  font:400 11px/1.8 'IBM Plex Mono',monospace;color:rgba(22,21,15,.42)
+}
+.cta{
+  padding:50px 0 0;border-top:1px solid var(--line);margin-top:40px;
+  display:flex;flex-wrap:wrap;gap:10px
+}
+.btn{
+  min-height:44px;padding:14px 22px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font:500 10px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.12em;text-transform:uppercase
+}
+.btn-primary{background:var(--ink);color:var(--bg)}
+.btn-outline{border:1px solid rgba(22,21,15,.28)}
+footer{
+  padding:44px 0 56px;display:flex;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+  font:400 10px/1.6 'IBM Plex Mono',monospace;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.42)
+}
+
+@media(max-width:767px){
+  .header-inner{
+    min-height:62px;
+    padding:9px max(20px,env(safe-area-inset-right)) 9px max(20px,env(safe-area-inset-left))
+  }
+  .back{font-size:9px;letter-spacing:.12em}
+  main{
+    width:100%;max-width:none;
+    padding:0 max(20px,env(safe-area-inset-right)) 0 max(20px,env(safe-area-inset-left))
+  }
+  .hero{width:min(100%,620px);margin:0 auto;padding:54px 0 48px}
+  .hero h1{font-size:clamp(38px,11vw,52px);line-height:1}
+  .hero-copy{font-size:13px;line-height:1.8}
+  .meta{gap:10px 22px;margin-top:30px}
+  .article-section{
+    width:min(100%,620px);margin:0 auto;padding:48px 0 56px;
+    display:flex;flex-direction:column;gap:20px
+  }
+  .section-label{text-align:center}
+  .copy{width:100%;max-width:560px;margin:0 auto}
+  .copy p{font-size:13px;line-height:1.85}
+  .bullets li{grid-template-columns:14px minmax(0,1fr);gap:7px}
+  .change-row{grid-template-columns:1fr;gap:5px;text-align:center}
+  .change-row span:first-child{text-transform:uppercase;font-size:10px;letter-spacing:.12em}
+  .bar-label{width:70px;flex-basis:70px}
+  .note{width:min(100%,620px);margin:0 auto}
+  .cta{width:min(100%,620px);margin:40px auto 0}
+  .cta .btn{flex:1 1 100%}
+  footer{
+    width:min(100%,620px);margin:0 auto;
+    padding-bottom:max(44px,env(safe-area-inset-bottom));
+    flex-direction:column;align-items:center;text-align:center;gap:8px
+  }
+}
+@media(max-width:390px){
+  .header-inner{
+    padding-left:max(18px,env(safe-area-inset-left));
+    padding-right:max(18px,env(safe-area-inset-right))
+  }
+  main{
+    padding-left:max(18px,env(safe-area-inset-left));
+    padding-right:max(18px,env(safe-area-inset-right))
+  }
+}
+</style>
+</head>
+<body>
+<div id="progress" class="progress"></div>
+
+<header class="header">
+  <div class="header-inner">
+    <a class="back" href="index.html"><span>←</span><span id="backLabel">Volver al inicio</span></a>
+    <div class="lang">
+      <button data-lang="es">ES</button>
+      <button data-lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="eyebrow" id="eyebrow">Ensayo técnico · Ingeniería de datos</div>
+  <div data-es>
+    <h1>El costo en la nube no es una factura.<br><em>Es una decisión de diseño.</em></h1>
+    <p class="hero-copy">Volcado completo o refresco incremental: por qué la forma en que un pipeline trae los datos determina lo que cuesta operarlo, y por qué el síntoma casi nunca aparece como un error.</p>
+  </div>
+  <div data-en hidden>
+    <h1>Cloud cost is not an invoice.<br><em>It is a design decision.</em></h1>
+    <p class="hero-copy">Full dump or incremental refresh: why the way a pipeline pulls data decides what it costs to run, and why the symptom almost never shows up as an error.</p>
+  </div>
+  <div class="meta">
+    <span>Christian J. Medina Díaz</span>
+    <span id="metaWhen">Julio 2026</span>
+    <span id="metaRead">Lectura de 5 minutos</span>
+  </div>
+</section>
+
+<div data-es>
+  <section class="article-section first">
+    <div class="section-label">01 — El patrón</div>
+    <div class="copy">
+      <p>Casi todo pipeline de datos empieza igual: hay una base transaccional, hay que analizar lo que vive en ella, y la forma más simple de lograrlo es copiarla completa cada cierto tiempo. Un volcado completo — leer la tabla entera, reescribirla entera — y listo.</p>
+      <p>Y es la decisión correcta al principio. Es fácil de escribir, fácil de entender, imposible de desincronizar: cada corrida deja el destino idéntico al origen. No tiene estado que cuidar. Cualquiera que herede el código sabe exactamente qué hace.</p>
+      <p>El problema no es la decisión. Es que nadie la vuelve a mirar.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <div class="section-label">02 — Por qué envejece mal</div>
+    <div class="copy">
+      <p class="lead">Un volcado completo hace que el trabajo dependa del tamaño acumulado, no del cambio real. Es la única variable que solo crece.</p>
+      <p>Con mil registros, la diferencia entre traer todo y traer lo nuevo es invisible. Con millones, el mismo código hace tres cosas que nadie pidió:</p>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>El tiempo de corrida crece en proporción al histórico. Cada día que pasa, la corrida es un poco más lenta — y nadie nota una degradación diaria de fracciones de segundo.</span></li>
+        <li><span class="dash">—</span><span>Las lecturas masivas compiten con la operación. La base transaccional está atendiendo el negocio y a la vez sirviendo un escaneo completo que no le aporta nada.</span></li>
+        <li><span class="dash">—</span><span>El costo sube de forma monótona. En la nube, cómputo y lectura se facturan; repetir trabajo ya hecho se paga cada vez que se repite.</span></li>
+      </ul>
+      <p>Lo insidioso es que nada de esto se ve como un fallo. El pipeline devuelve datos correctos. No hay alerta que dispare, no hay excepción que capturar, no hay ticket que asignar. Un sistema puede estar funcionando perfectamente y estar mal diseñado a la vez.</p>
+      <div class="compare">
+        <div class="compare-title">Volcado completo</div>
+        <div class="compare-body">
+          <div class="bar-row"><span class="bar-label">Corrida 1</span><span class="bar full"></span></div>
+          <div class="bar-row"><span class="bar-label">Corrida 2</span><span class="bar full"></span></div>
+          <div class="bar-row"><span class="bar-label">Corrida 3</span><span class="bar full"></span></div>
+          <div class="compare-note">Todo el histórico, en cada ejecución.</div>
+        </div>
+        <div class="compare-title alt">Refresco incremental</div>
+        <div class="compare-body alt">
+          <div class="bar-row"><span class="bar-label">Carga inicial</span><span class="bar initial"></span></div>
+          <div class="bar-row"><span class="bar-label">Corrida 2</span><span class="bar small7"></span></div>
+          <div class="bar-row"><span class="bar-label">Corrida 3</span><span class="bar small5"></span></div>
+          <div class="compare-note">Solo lo nuevo o modificado desde la última corrida. <span style="opacity:.7">Proporciones ilustrativas.</span></div>
+        </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main style="max-width:1080px;margin:0 auto;padding:0 40px">
-
-    <section style="padding:96px 0 56px;max-width:760px;border-bottom:1px solid rgba(22,21,15,.14)">
-      <div data-anim="1" style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:#e51a0d;margin-bottom:28px">{{ eyebrow }}</div>
-      <div style="display:{{ dEs }}">
-        <h1 data-anim="2" data-parallax="0.05" style="margin:0;font:400 clamp(38px,5.6vw,66px)/1.03 'Instrument Serif',Georgia,serif;letter-spacing:-.012em;text-wrap:pretty">El costo en la nube no es una factura.<br><em>Es una decisión de diseño.</em></h1>
-        <p data-anim="3" style="margin:32px 0 0;font:400 15px/1.85 'IBM Plex Mono',monospace;color:rgba(22,21,15,.7);max-width:580px;text-wrap:pretty">Volcado completo o refresco incremental: por qué la forma en que un pipeline trae los datos determina lo que cuesta operarlo, y por qué el síntoma casi nunca aparece como un error.</p>
-      </div>
-      <div style="display:{{ dEn }}">
-        <h1 data-anim="2" data-parallax="0.05" style="margin:0;font:400 clamp(38px,5.6vw,66px)/1.03 'Instrument Serif',Georgia,serif;letter-spacing:-.012em;text-wrap:pretty">Cloud cost is not an invoice.<br><em>It is a design decision.</em></h1>
-        <p data-anim="3" style="margin:32px 0 0;font:400 15px/1.85 'IBM Plex Mono',monospace;color:rgba(22,21,15,.7);max-width:580px;text-wrap:pretty">Full dump or incremental refresh: why the way a pipeline pulls data decides what it costs to run, and why the symptom almost never shows up as an error.</p>
-      </div>
-      <div data-anim="4" style="display:flex;flex-wrap:wrap;gap:28px;margin-top:40px;font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5)">
-        <span>Christian J. Medina Díaz</span>
-        <span>{{ metaWhen }}</span>
-        <span>{{ metaRead }}</span>
-      </div>
-    </section>
-
-    <div style="display:{{ dEs }}">
-      <section style="padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">01 — El patrón</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Casi todo pipeline de datos empieza igual: hay una base transaccional, hay que analizar lo que vive en ella, y la forma más simple de lograrlo es copiarla completa cada cierto tiempo. Un volcado completo — leer la tabla entera, reescribirla entera — y listo.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Y es la decisión correcta al principio. Es fácil de escribir, fácil de entender, imposible de desincronizar: cada corrida deja el destino idéntico al origen. No tiene estado que cuidar. Cualquiera que herede el código sabe exactamente qué hace.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">El problema no es la decisión. Es que nadie la vuelve a mirar.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">02 — Por qué envejece mal</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(21px,2.5vw,28px)/1.45 'Instrument Serif',Georgia,serif;text-wrap:pretty">Un volcado completo hace que el trabajo dependa del tamaño acumulado, no del cambio real. Es la única variable que solo crece.</p>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Con mil registros, la diferencia entre traer todo y traer lo nuevo es invisible. Con millones, el mismo código hace tres cosas que nadie pidió:</p>
-          <ul data-reveal style="margin:20px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-            <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">El tiempo de corrida crece en proporción al histórico. Cada día que pasa, la corrida es un poco más lenta — y nadie nota una degradación diaria de fracciones de segundo.</span></li>
-            <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Las lecturas masivas compiten con la operación. La base transaccional está atendiendo el negocio y a la vez sirviendo un escaneo completo que no le aporta nada.</span></li>
-            <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">El costo sube de forma monótona. En la nube, cómputo y lectura se facturan; repetir trabajo ya hecho se paga cada vez que se repite.</span></li>
-          </ul>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Lo insidioso es que nada de esto se ve como un fallo. El pipeline devuelve datos correctos. No hay alerta que dispare, no hay excepción que capturar, no hay ticket que asignar. Un sistema puede estar funcionando perfectamente y estar mal diseñado a la vez.</p>
-
-          <div data-reveal style="margin-top:36px;border:1px solid rgba(22,21,15,.14)">
-            <div style="padding:16px 20px;border-bottom:1px solid rgba(22,21,15,.14);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,15,.5)">Volcado completo</div>
-            <div style="padding:22px 20px;display:flex;flex-direction:column;gap:9px">
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Corrida 1</span><span style="height:14px;width:100%;background:rgba(229,26,13,.85)"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Corrida 2</span><span style="height:14px;width:100%;background:rgba(229,26,13,.85)"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Corrida 3</span><span style="height:14px;width:100%;background:rgba(229,26,13,.85)"></span></div>
-              <div style="font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);margin-top:4px">Todo el histórico, en cada ejecución.</div>
-            </div>
-            <div style="padding:16px 20px;border-top:1px solid rgba(22,21,15,.14);border-bottom:1px solid rgba(22,21,15,.14);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,15,.5);background:rgba(22,21,15,.03)">Refresco incremental</div>
-            <div style="padding:22px 20px;display:flex;flex-direction:column;gap:9px;background:rgba(22,21,15,.03)">
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Carga inicial</span><span style="height:14px;width:100%;background:rgba(22,21,15,.32)"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Corrida 2</span><span style="height:14px;width:7%;background:#e51a0d"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Corrida 3</span><span style="height:14px;width:5%;background:#e51a0d"></span></div>
-              <div style="font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);margin-top:4px">Solo lo nuevo o modificado desde la última corrida. <span style="color:rgba(22,21,15,.38)">Proporciones ilustrativas.</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">03 — La pregunta</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Cuando reviso una ingesta que ya funciona, la pregunta que más rinde no es de rendimiento. Es de necesidad: <em style="font-style:normal;color:#16150f">¿por qué estamos rehaciendo este trabajo? ¿Es estrictamente necesario?</em></p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Si la mayor parte del histórico no cambia entre una corrida y la siguiente, volver a traerlo no es procesamiento: es repetición. Y la repetición en la nube tiene precio de lista.</p>
-          <div data-reveal style="margin-top:32px;padding:22px 24px;border-left:2px solid #e51a0d;background:rgba(22,21,15,.03)">
-            <p style="margin:0;font:400 clamp(18px,2.2vw,23px)/1.5 'Instrument Serif',Georgia,serif;text-wrap:pretty">«¿Cómo hago esto más rápido?» optimiza el trabajo. «¿Por qué estoy haciendo este trabajo otra vez?» lo elimina.</p>
-          </div>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">La primera pregunta te lleva a índices, particiones y hardware más grande. La segunda te lleva al diseño. Casi siempre la segunda gana por mucho, porque el trabajo más rápido siempre es el que no se hace.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">04 — Tres caminos</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Frente a una ingesta que se volvió cara, hay tres respuestas posibles. Solo una ataca la causa.</p>
-          <div data-reveal style="margin-top:22px;display:flex;flex-direction:column">
-            <div style="display:flex;flex-direction:column;gap:7px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 18px/1.35 'Instrument Serif',Georgia,serif">Escalar el hardware</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Inmediato y sin tocar código. Pero sube el costo en vez de bajarlo, y compra tiempo prestado: el problema regresa con el próximo salto de volumen, y regresa más caro.</p>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:7px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 18px/1.35 'Instrument Serif',Georgia,serif">Bajar la frecuencia</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Reduce el gasto de inmediato, pero le cobra el ahorro al negocio en forma de datos más viejos. Ahorrar degradando el producto no es ahorrar: es mover el costo a un renglón que no aparece en la factura.</p>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:7px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12);border-bottom:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 18px/1.35 'Instrument Serif',Georgia,serif;color:#e51a0d">Refresco incremental</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Más trabajo por adelantado y más lógica que mantener. A cambio, el costo y el tiempo pasan a depender del cambio real y no del tamaño acumulado. Es el único de los tres que mejora con el tiempo en vez de empeorar.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">05 — Qué cambia</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">El cambio no es una mejora porcentual: es un cambio de variable. Antes, el trabajo por corrida era función del histórico acumulado. Después, es función de lo que pasó desde la última corrida.</p>
-          <div data-reveal style="margin-top:26px;display:flex;flex-direction:column">
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Tiempo de corrida</span><span>proporcional al cambio, no al total</span></div>
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Costo</span><span>deja de crecer solo con el tiempo</span></div>
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Base transaccional</span><span>deja de absorber escaneos completos</span></div>
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);border-bottom:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Escalabilidad</span><span>el volumen histórico deja de ser el límite</span></div>
-          </div>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Y una consecuencia que se subestima: como la corrida pasa a ser corta, se puede correr más seguido. El mismo cambio que abarata la operación permite datos más frescos. Eso casi nunca pasa — normalmente hay que elegir.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">06 — Lo que cuesta</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Sería deshonesto presentarlo como gratis. Un volcado completo es idempotente: si algo salió mal, la próxima corrida lo arregla. Una ingesta incremental no tiene esa red. Tiene estado — sabe hasta dónde llegó — y el estado se puede corromper.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Eso obliga a decidir cosas que antes no existían: cómo identificar de forma confiable lo que cambió, qué hacer con los registros que se borran en el origen, y cómo se recupera una corrida que falló a mitad de camino sin duplicar ni perder nada.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Por eso la validación de datos deja de ser un paso opcional y pasa a ser parte del pipeline. En un modelo incremental, un error silencioso no se corrige solo: se acumula. Es el trade-off real — complejidad a cambio de que el sistema deje de pagar por el pasado.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 50px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">07 — Lo que me quedó</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(21px,2.6vw,29px)/1.45 'Instrument Serif',Georgia,serif;text-wrap:pretty">El costo en la nube es una métrica de ingeniería, no de finanzas. Si nadie de ingeniería mira esa gráfica, el diseño no tiene quien lo audite.</p>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">En infraestructura propia, un pipeline ineficiente se pagaba una vez, cuando se compró el servidor. En la nube se paga cada mañana. Eso convierte decisiones de diseño que antes eran invisibles en una línea medible — y ese es un regalo, si alguien la está leyendo.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">La lección que me llevo no es sobre pipelines. Es que un sistema que funciona no está terminado, solo está sin revisar. Vale la pena volver a preguntarle a lo que ya funciona por qué funciona así.</p>
-        </div>
-      </section>
+  <section class="article-section">
+    <div class="section-label">03 — La pregunta</div>
+    <div class="copy">
+      <p>Cuando reviso una ingesta que ya funciona, la pregunta que más rinde no es de rendimiento. Es de necesidad: <span style="color:#16150f">¿por qué estamos rehaciendo este trabajo? ¿Es estrictamente necesario?</span></p>
+      <p>Si la mayor parte del histórico no cambia entre una corrida y la siguiente, volver a traerlo no es procesamiento: es repetición. Y la repetición en la nube tiene precio de lista.</p>
+      <div class="quote"><p>«¿Cómo hago esto más rápido?» optimiza el trabajo. «¿Por qué estoy haciendo este trabajo otra vez?» lo elimina.</p></div>
+      <p>La primera pregunta te lleva a índices, particiones y hardware más grande. La segunda te lleva al diseño. Casi siempre la segunda gana por mucho, porque el trabajo más rápido siempre es el que no se hace.</p>
     </div>
+  </section>
 
-    <div style="display:{{ dEn }}">
-      <section style="padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">01 — The pattern</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Almost every data pipeline starts the same way: there's a transactional database, something in it needs analyzing, and the simplest way to get there is to copy the whole thing on a schedule. A full dump — read the entire table, rewrite the entire table — done.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">And it's the right call at first. Easy to write, easy to reason about, impossible to desynchronize: every run leaves the destination identical to the source. No state to babysit. Anyone who inherits the code knows exactly what it does.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">The problem isn't the decision. It's that nobody revisits it.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">02 — Why it ages badly</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(21px,2.5vw,28px)/1.45 'Instrument Serif',Georgia,serif;text-wrap:pretty">A full dump ties the work to accumulated size rather than actual change. That's the one variable that only ever grows.</p>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">At a thousand records, the difference between pulling everything and pulling what's new is invisible. At millions, the same code does three things nobody asked for:</p>
-          <ul data-reveal style="margin:20px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-            <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Run time grows in proportion to history. Every day the run gets a little slower — and nobody notices a daily degradation measured in fractions of a second.</span></li>
-            <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Massive reads compete with operations. The transactional database is serving the business and a full scan that gives it nothing, at the same time.</span></li>
-            <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Cost climbs monotonically. In the cloud, compute and reads are billed; repeating work already done is paid for every time it repeats.</span></li>
-          </ul>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">What makes it insidious is that none of it looks like a failure. The pipeline returns correct data. No alert fires, no exception to catch, no ticket to assign. A system can be working perfectly and be badly designed at the same time.</p>
-
-          <div data-reveal style="margin-top:36px;border:1px solid rgba(22,21,15,.14)">
-            <div style="padding:16px 20px;border-bottom:1px solid rgba(22,21,15,.14);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,15,.5)">Full dump</div>
-            <div style="padding:22px 20px;display:flex;flex-direction:column;gap:9px">
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Run 1</span><span style="height:14px;width:100%;background:rgba(229,26,13,.85)"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Run 2</span><span style="height:14px;width:100%;background:rgba(229,26,13,.85)"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Run 3</span><span style="height:14px;width:100%;background:rgba(229,26,13,.85)"></span></div>
-              <div style="font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);margin-top:4px">The entire history, on every execution.</div>
-            </div>
-            <div style="padding:16px 20px;border-top:1px solid rgba(22,21,15,.14);border-bottom:1px solid rgba(22,21,15,.14);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,15,.5);background:rgba(22,21,15,.03)">Incremental refresh</div>
-            <div style="padding:22px 20px;display:flex;flex-direction:column;gap:9px;background:rgba(22,21,15,.03)">
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Initial load</span><span style="height:14px;width:100%;background:rgba(22,21,15,.32)"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Run 2</span><span style="height:14px;width:7%;background:#e51a0d"></span></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="width:78px;font:400 10px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45)">Run 3</span><span style="height:14px;width:5%;background:#e51a0d"></span></div>
-              <div style="font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);margin-top:4px">Only what's new or modified since the last run. <span style="color:rgba(22,21,15,.38)">Proportions illustrative.</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">03 — The question</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">When I look at an ingest that already works, the question that pays best isn't about performance. It's about necessity: <em style="font-style:normal;color:#16150f">why are we redoing this work? Is it strictly necessary?</em></p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">If most of the history doesn't change between one run and the next, pulling it again isn't processing — it's repetition. And in the cloud, repetition is billed at list price.</p>
-          <div data-reveal style="margin-top:32px;padding:22px 24px;border-left:2px solid #e51a0d;background:rgba(22,21,15,.03)">
-            <p style="margin:0;font:400 clamp(18px,2.2vw,23px)/1.5 'Instrument Serif',Georgia,serif;text-wrap:pretty">"How do I make this faster?" optimizes the work. "Why am I doing this work again?" removes it.</p>
-          </div>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">The first question leads to indexes, partitions and bigger hardware. The second leads to the design. The second usually wins by a wide margin, because the fastest work is always the work you don't do.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">04 — Three paths</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">Facing an ingest that got expensive, there are three possible answers. Only one addresses the cause.</p>
-          <div data-reveal style="margin-top:22px;display:flex;flex-direction:column">
-            <div style="display:flex;flex-direction:column;gap:7px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 18px/1.35 'Instrument Serif',Georgia,serif">Scale up the hardware</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Immediate, no code touched. But it raises cost instead of lowering it, and it buys borrowed time: the problem returns with the next jump in volume, and returns more expensive.</p>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:7px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 18px/1.35 'Instrument Serif',Georgia,serif">Lower the frequency</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Cuts spend right away, but bills the saving to the business as staler data. Saving by degrading the product isn't saving: it's moving the cost to a line that never shows up on the invoice.</p>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:7px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12);border-bottom:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 18px/1.35 'Instrument Serif',Georgia,serif;color:#e51a0d">Incremental refresh</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">More work up front and more logic to maintain. In exchange, cost and time come to depend on real change instead of accumulated size. It's the only one of the three that improves over time instead of degrading.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">05 — What changes</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">The change isn't a percentage improvement — it's a change of variable. Before, work per run was a function of accumulated history. After, it's a function of what happened since the last run.</p>
-          <div data-reveal style="margin-top:26px;display:flex;flex-direction:column">
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Run time</span><span>scales with change, not with the total</span></div>
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Cost</span><span>stops growing with time alone</span></div>
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Transactional DB</span><span>stops absorbing full scans</span></div>
-            <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;padding:17px 0;border-top:1px solid rgba(22,21,15,.12);border-bottom:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45)">Scalability</span><span>historical volume stops being the ceiling</span></div>
-          </div>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">And one consequence that gets underrated: because the run becomes short, it can run more often. The same change that makes the operation cheaper also makes the data fresher. That's rare — usually you have to choose.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 66px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">06 — What it costs</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">It would be dishonest to present this as free. A full dump is idempotent: if something went wrong, the next run fixes it. An incremental ingest has no such net. It carries state — it knows how far it got — and state can be corrupted.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">That forces decisions that didn't exist before: how to reliably identify what changed, what to do about records deleted at the source, and how a run that failed halfway recovers without duplicating or losing anything.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">That's why data validation stops being an optional step and becomes part of the pipeline. In an incremental model a silent error doesn't correct itself — it compounds. That's the real trade-off: complexity, in exchange for a system that stops paying for its own past.</p>
-        </div>
-      </section>
-
-      <section style="border-top:1px solid rgba(22,21,15,.14);padding:60px 0 50px;display:grid;grid-template-columns:150px 1fr;gap:40px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">07 — What stayed with me</div>
-        <div style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(21px,2.6vw,29px)/1.45 'Instrument Serif',Georgia,serif;text-wrap:pretty">Cloud cost is an engineering metric, not a finance one. If nobody in engineering reads that graph, nothing audits the design.</p>
-          <p data-reveal style="margin:24px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">On owned infrastructure, an inefficient pipeline was paid for once, when the server was bought. In the cloud it's paid for every morning. That turns design decisions that used to be invisible into a measurable line — and that's a gift, if someone is reading it.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.72);text-wrap:pretty">The lesson I take isn't about pipelines. It's that a system that works isn't finished, it's just unreviewed. It's worth asking the things that already work why they work that way.</p>
-        </div>
-      </section>
-    </div>
-
-    <section data-reveal style="border-top:1px solid rgba(22,21,15,.14);padding:26px 0 0">
-      <p style="margin:0;font:400 11px/1.8 'IBM Plex Mono',monospace;color:rgba(22,21,15,.42);max-width:640px;text-wrap:pretty">{{ note }}</p>
-    </section>
-
-    <section style="padding:50px 0 0;border-top:1px solid rgba(22,21,15,.14);margin-top:40px">
-      <div data-reveal style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-        <a href="mailto:cjmedina99@gmail.com" style="padding:14px 22px;background:#16150f;color:#f5f3ee;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),background .35s" style-hover="transform:translateY(-2px);background:#e51a0d">cjmedina99@gmail.com</a>
-        <a href="index.html" style="padding:14px 22px;border:1px solid rgba(22,21,15,.28);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s" style-hover="transform:translateY(-2px);border-color:#e51a0d">{{ backLabel }}</a>
+  <section class="article-section">
+    <div class="section-label">04 — Tres caminos</div>
+    <div class="copy">
+      <p>Frente a una ingesta que se volvió cara, hay tres respuestas posibles. Solo una ataca la causa.</p>
+      <div class="paths">
+        <div class="path"><div class="path-title">Escalar el hardware</div><p>Inmediato y sin tocar código. Pero sube el costo en vez de bajarlo, y compra tiempo prestado: el problema regresa con el próximo salto de volumen, y regresa más caro.</p></div>
+        <div class="path"><div class="path-title">Bajar la frecuencia</div><p>Reduce el gasto de inmediato, pero le cobra el ahorro al negocio en forma de datos más viejos. Ahorrar degradando el producto no es ahorrar: es mover el costo a un renglón que no aparece en la factura.</p></div>
+        <div class="path"><div class="path-title good">Refresco incremental</div><p>Más trabajo por adelantado y más lógica que mantener. A cambio, el costo y el tiempo pasan a depender del cambio real y no del tamaño acumulado. Es el único de los tres que mejora con el tiempo en vez de empeorar.</p></div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <footer style="padding:44px 0 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.42)">
-      <span>© 2026 Christian J. Medina Díaz</span>
-      <span>{{ footNote }}</span>
-    </footer>
+  <section class="article-section">
+    <div class="section-label">05 — Qué cambia</div>
+    <div class="copy">
+      <p>El cambio no es una mejora porcentual: es un cambio de variable. Antes, el trabajo por corrida era función del histórico acumulado. Después, es función de lo que pasó desde la última corrida.</p>
+      <div class="change-list">
+        <div class="change-row"><span>Tiempo de corrida</span><span>proporcional al cambio, no al total</span></div>
+        <div class="change-row"><span>Costo</span><span>deja de crecer solo con el tiempo</span></div>
+        <div class="change-row"><span>Base transaccional</span><span>deja de absorber escaneos completos</span></div>
+        <div class="change-row"><span>Escalabilidad</span><span>el volumen histórico deja de ser el límite</span></div>
+      </div>
+      <p>Y una consecuencia que se subestima: como la corrida pasa a ser corta, se puede correr más seguido. El mismo cambio que abarata la operación permite datos más frescos. Eso casi nunca pasa — normalmente hay que elegir.</p>
+    </div>
+  </section>
 
-  </main>
+  <section class="article-section">
+    <div class="section-label">06 — Lo que cuesta</div>
+    <div class="copy">
+      <p>Sería deshonesto presentarlo como gratis. Un volcado completo es idempotente: si algo salió mal, la próxima corrida lo arregla. Una ingesta incremental no tiene esa red. Tiene estado — sabe hasta dónde llegó — y el estado se puede corromper.</p>
+      <p>Eso obliga a decidir cosas que antes no existían: cómo identificar de forma confiable lo que cambió, qué hacer con los registros que se borran en el origen, y cómo se recupera una corrida que falló a mitad de camino sin duplicar ni perder nada.</p>
+      <p>Por eso la validación de datos deja de ser un paso opcional y pasa a ser parte del pipeline. En un modelo incremental, un error silencioso no se corrige solo: se acumula. Es el trade-off real — complejidad a cambio de que el sistema deje de pagar por el pasado.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <div class="section-label">07 — Lo que me quedó</div>
+    <div class="copy">
+      <p class="lead">El costo en la nube es una métrica de ingeniería, no de finanzas. Si nadie de ingeniería mira esa gráfica, el diseño no tiene quien lo audite.</p>
+      <p>En infraestructura propia, un pipeline ineficiente se pagaba una vez, cuando se compró el servidor. En la nube se paga cada mañana. Eso convierte decisiones de diseño que antes eran invisibles en una línea medible — y ese es un regalo, si alguien la está leyendo.</p>
+      <p>La lección que me llevo no es sobre pipelines. Es que un sistema que funciona no está terminado, solo está sin revisar. Vale la pena volver a preguntarle a lo que ya funciona por qué funciona así.</p>
+    </div>
+  </section>
 </div>
 
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
-class Component extends DCLogic {
-  state = { lang: 'es' };
-  bar = React.createRef();
+<div data-en hidden>
+  <section class="article-section first">
+    <div class="section-label">01 — The pattern</div>
+    <div class="copy">
+      <p>Almost every data pipeline starts the same way: there's a transactional database, something in it needs analyzing, and the simplest way to get there is to copy the whole thing on a schedule. A full dump — read the entire table, rewrite the entire table — done.</p>
+      <p>And it's the right call at first. Easy to write, easy to reason about, impossible to desynchronize: every run leaves the destination identical to the source. No state to babysit. Anyone who inherits the code knows exactly what it does.</p>
+      <p>The problem isn't the decision. It's that nobody revisits it.</p>
+    </div>
+  </section>
 
-  componentDidMount() {
-    try {
-      const saved = localStorage.getItem('cjm-lang');
-      if (saved === 'en' || saved === 'es') this.setState({ lang: saved });
-    } catch (e) {}
-    this.onScroll = () => {
-      const y = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (this.bar.current) this.bar.current.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-      document.querySelectorAll('[data-parallax]').forEach(el => {
-        el.style.transform = 'translate3d(0,' + (y * parseFloat(el.dataset.parallax)).toFixed(2) + 'px,0)';
-      });
-      if (this.sweep) this.sweep();
-    };
-    window.addEventListener('scroll', this.onScroll, { passive: true });
-    this.setupMotion();
-  }
+  <section class="article-section">
+    <div class="section-label">02 — Why it ages badly</div>
+    <div class="copy">
+      <p class="lead">A full dump ties the work to accumulated size rather than actual change. That's the one variable that only ever grows.</p>
+      <p>At a thousand records, the difference between pulling everything and pulling what's new is invisible. At millions, the same code does three things nobody asked for:</p>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Run time grows in proportion to history. Every day the run gets a little slower — and nobody notices a daily degradation measured in fractions of a second.</span></li>
+        <li><span class="dash">—</span><span>Massive reads compete with operations. The transactional database is serving the business and a full scan that gives it nothing, at the same time.</span></li>
+        <li><span class="dash">—</span><span>Cost climbs monotonically. In the cloud, compute and reads are billed; repeating work already done is paid for every time it repeats.</span></li>
+      </ul>
+      <p>What makes it insidious is that none of it looks like a failure. The pipeline returns correct data. No alert fires, no exception to catch, no ticket to assign. A system can be working perfectly and be badly designed at the same time.</p>
+      <div class="compare">
+        <div class="compare-title">Full dump</div>
+        <div class="compare-body">
+          <div class="bar-row"><span class="bar-label">Run 1</span><span class="bar full"></span></div>
+          <div class="bar-row"><span class="bar-label">Run 2</span><span class="bar full"></span></div>
+          <div class="bar-row"><span class="bar-label">Run 3</span><span class="bar full"></span></div>
+          <div class="compare-note">The entire history, on every execution.</div>
+        </div>
+        <div class="compare-title alt">Incremental refresh</div>
+        <div class="compare-body alt">
+          <div class="bar-row"><span class="bar-label">Initial load</span><span class="bar initial"></span></div>
+          <div class="bar-row"><span class="bar-label">Run 2</span><span class="bar small7"></span></div>
+          <div class="bar-row"><span class="bar-label">Run 3</span><span class="bar small5"></span></div>
+          <div class="compare-note">Only what's new or modified since the last run. <span style="opacity:.7">Proportions illustrative.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  componentDidUpdate(_p, prev) {
-    if (prev.lang !== this.state.lang) this.setupMotion();
-  }
+  <section class="article-section">
+    <div class="section-label">03 — The question</div>
+    <div class="copy">
+      <p>When I look at an ingest that already works, the question that pays best isn't about performance. It's about necessity: <span style="color:#16150f">why are we redoing this work? Is it strictly necessary?</span></p>
+      <p>If most of the history doesn't change between one run and the next, pulling it again isn't processing — it's repetition. And in the cloud, repetition is billed at list price.</p>
+      <div class="quote"><p>"How do I make this faster?" optimizes the work. "Why am I doing this work again?" removes it.</p></div>
+      <p>The first question leads to indexes, partitions and bigger hardware. The second leads to the design. The second usually wins by a wide margin, because the fastest work is always the work you don't do.</p>
+    </div>
+  </section>
 
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScroll);
-    if (this.io) this.io.disconnect();
-  }
+  <section class="article-section">
+    <div class="section-label">04 — Three paths</div>
+    <div class="copy">
+      <p>Facing an ingest that got expensive, there are three possible answers. Only one addresses the cause.</p>
+      <div class="paths">
+        <div class="path"><div class="path-title">Scale up the hardware</div><p>Immediate, no code touched. But it raises cost instead of lowering it, and it buys borrowed time: the problem returns with the next jump in volume, and returns more expensive.</p></div>
+        <div class="path"><div class="path-title">Lower the frequency</div><p>Cuts spend right away, but bills the saving to the business as staler data. Saving by degrading the product isn't saving: it's moving the cost to a line that never shows up on the invoice.</p></div>
+        <div class="path"><div class="path-title good">Incremental refresh</div><p>More work up front and more logic to maintain. In exchange, cost and time come to depend on real change instead of accumulated size. It's the only one of the three that improves over time instead of degrading.</p></div>
+      </div>
+    </div>
+  </section>
 
-  pick(lang) {
-    try { localStorage.setItem('cjm-lang', lang); } catch (e) {}
-    this.setState({ lang: lang });
-  }
+  <section class="article-section">
+    <div class="section-label">05 — What changes</div>
+    <div class="copy">
+      <p>The change isn't a percentage improvement — it's a change of variable. Before, work per run was a function of accumulated history. After, it's a function of what happened since the last run.</p>
+      <div class="change-list">
+        <div class="change-row"><span>Run time</span><span>scales with change, not with the total</span></div>
+        <div class="change-row"><span>Cost</span><span>stops growing with time alone</span></div>
+        <div class="change-row"><span>Transactional DB</span><span>stops absorbing full scans</span></div>
+        <div class="change-row"><span>Scalability</span><span>historical volume stops being the ceiling</span></div>
+      </div>
+      <p>And one consequence that gets underrated: because the run becomes short, it can run more often. The same change that makes the operation cheaper also makes the data fresher. That's rare — usually you have to choose.</p>
+    </div>
+  </section>
 
-  setupMotion() {
-    const ease = 'opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1)';
-    document.querySelectorAll('[data-anim]').forEach(el => {
-      el.style.animation = 'cmRise .95s cubic-bezier(.2,.8,.2,1) both';
-      el.style.animationDelay = (parseInt(el.dataset.anim, 10) * 0.09) + 's';
+  <section class="article-section">
+    <div class="section-label">06 — What it costs</div>
+    <div class="copy">
+      <p>It would be dishonest to present this as free. A full dump is idempotent: if something went wrong, the next run fixes it. An incremental ingest has no such net. It carries state — it knows how far it got — and state can be corrupted.</p>
+      <p>That forces decisions that didn't exist before: how to reliably identify what changed, what to do about records deleted at the source, and how a run that failed halfway recovers without duplicating or losing anything.</p>
+      <p>That's why data validation stops being an optional step and becomes part of the pipeline. In an incremental model a silent error doesn't correct itself — it compounds. That's the real trade-off: complexity, in exchange for a system that stops paying for its own past.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <div class="section-label">07 — What stayed with me</div>
+    <div class="copy">
+      <p class="lead">Cloud cost is an engineering metric, not a finance one. If nobody in engineering reads that graph, nothing audits the design.</p>
+      <p>On owned infrastructure, an inefficient pipeline was paid for once, when the server was bought. In the cloud it's paid for every morning. That turns design decisions that used to be invisible into a measurable line — and that's a gift, if someone is reading it.</p>
+      <p>The lesson I take isn't about pipelines. It's that a system that works isn't finished, it's just unreviewed. It's worth asking the things that already work why they work that way.</p>
+    </div>
+  </section>
+</div>
+
+<section class="note" id="note">
+  Escrito a partir de mi experiencia rediseñando pipelines de ingesta en producción. No describe el sistema, los datos ni los resultados de ningún cliente en particular.
+</section>
+
+<section class="cta">
+  <a class="btn btn-primary" href="mailto:cjmedina99@gmail.com">cjmedina99@gmail.com</a>
+  <a class="btn btn-outline" href="index.html" id="backButton">Volver al inicio</a>
+</section>
+
+<footer>
+  <span>© 2026 Christian J. Medina Díaz</span>
+  <span id="footNote">San Juan, PR · Remoto</span>
+</footer>
+</main>
+
+<script>
+(() => {
+  const progress = document.getElementById('progress');
+  const backLabel = document.getElementById('backLabel');
+  const backButton = document.getElementById('backButton');
+  const eyebrow = document.getElementById('eyebrow');
+  const metaWhen = document.getElementById('metaWhen');
+  const metaRead = document.getElementById('metaRead');
+  const note = document.getElementById('note');
+  const footNote = document.getElementById('footNote');
+
+  function setLang(lang){
+    const es = lang === 'es';
+    document.querySelectorAll('[data-es]').forEach(el => el.hidden = !es);
+    document.querySelectorAll('[data-en]').forEach(el => el.hidden = es);
+    document.querySelectorAll('[data-lang="es"]').forEach(el => {
+      el.style.color = es ? '#16150f' : 'rgba(22,21,15,.4)';
+      el.style.textDecoration = es ? 'underline' : 'none';
+      el.style.textUnderlineOffset = '4px';
+      el.style.textDecorationColor = es ? '#e51a0d' : 'transparent';
     });
-    if (this.io) { this.io.disconnect(); this.io = null; }
-
-    const show = el => {
-      el.dataset.revealed = '1';
-      el.style.opacity = '1';
-      el.style.transform = 'none';
-    };
-    const inView = el => {
-      const r = el.getBoundingClientRect();
-      return r.top < window.innerHeight * 0.95 && r.bottom > -40;
-    };
-    const els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
-
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      els.forEach(show);
-      this.sweep = null;
-      requestAnimationFrame(() => this.onScroll && this.onScroll());
-      return;
-    }
-
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        show(e.target);
-        io.unobserve(e.target);
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
-    this.io = io;
-
-    els.forEach((el, i) => {
-      if (el.dataset.revealed || inView(el)) { show(el); return; }
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(22px)';
-      el.style.transition = ease;
-      el.style.transitionDelay = ((i % 4) * 0.07) + 's';
-      io.observe(el);
+    document.querySelectorAll('[data-lang="en"]').forEach(el => {
+      el.style.color = es ? 'rgba(22,21,15,.4)' : '#16150f';
+      el.style.textDecoration = es ? 'none' : 'underline';
+      el.style.textUnderlineOffset = '4px';
+      el.style.textDecorationColor = es ? 'transparent' : '#e51a0d';
     });
 
-    // red de seguridad: si el observer falla, nada queda invisible
-    this.sweep = () => els.forEach(el => { if (!el.dataset.revealed && inView(el)) show(el); });
-    setTimeout(() => this.sweep && this.sweep(), 1200);
-    requestAnimationFrame(() => this.onScroll && this.onScroll());
+    document.documentElement.lang = lang;
+    backLabel.textContent = es ? 'Volver al inicio' : 'Back to home';
+    backButton.textContent = es ? 'Volver al inicio' : 'Back to home';
+    eyebrow.textContent = es ? 'Ensayo técnico · Ingeniería de datos' : 'Technical essay · Data engineering';
+    metaWhen.textContent = es ? 'Julio 2026' : 'July 2026';
+    metaRead.textContent = es ? 'Lectura de 5 minutos' : '5 minute read';
+    footNote.textContent = es ? 'San Juan, PR · Remoto' : 'San Juan, PR · Remote';
+    note.textContent = es
+      ? 'Escrito a partir de mi experiencia rediseñando pipelines de ingesta en producción. No describe el sistema, los datos ni los resultados de ningún cliente en particular.'
+      : 'Written from my experience redesigning ingestion pipelines in production. It does not describe the system, data or results of any particular client.';
+
+    try { localStorage.setItem('cjm-lang', lang); } catch(e){}
   }
 
-  renderVals() {
-    const es = this.state.lang === 'es';
-    return {
-      bar: this.bar,
-      dEs: es ? 'block' : 'none',
-      dEn: es ? 'none' : 'block',
-      cEs: es ? '#16150f' : 'rgba(22,21,15,.4)',
-      cEn: es ? 'rgba(22,21,15,.4)' : '#16150f',
-      uEs: es ? '#e51a0d' : 'transparent',
-      uEn: es ? 'transparent' : '#e51a0d',
-      setEs: () => this.pick('es'),
-      setEn: () => this.pick('en'),
-      backLabel: es ? 'Volver al inicio' : 'Back to home',
-      eyebrow: es ? 'Ensayo técnico · Ingeniería de datos' : 'Technical essay · Data engineering',
-      metaWhen: es ? 'Julio 2026' : 'July 2026',
-      metaRead: es ? 'Lectura de 5 minutos' : '5 minute read',
-      footNote: es ? 'San Juan, PR · Remoto' : 'San Juan, PR · Remote',
-      note: es
-        ? 'Escrito a partir de mi experiencia rediseñando pipelines de ingesta en producción. No describe el sistema, los datos ni los resultados de ningún cliente en particular.'
-        : 'Written from my experience redesigning ingestion pipelines in production. It does not describe the system, data or results of any particular client.'
-    };
-  }
-}
+  document.querySelectorAll('[data-lang]').forEach(btn =>
+    btn.addEventListener('click', () => setLang(btn.dataset.lang))
+  );
+
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+  }, {passive:true});
+
+  let lang = 'es';
+  try {
+    const saved = localStorage.getItem('cjm-lang');
+    if(saved === 'es' || saved === 'en') lang = saved;
+  } catch(e){}
+  setLang(lang);
+})();
 </script>
 </body>
 </html>
