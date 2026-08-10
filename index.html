@@ -894,11 +894,29 @@ footer{
     progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
   }, {passive:true});
 
-  // Always show the language entry screen first.
-  // The saved language is preserved only as a preference for later switching,
-  // but it no longer skips the entry experience.
-  entryScreen.hidden = false;
-  portfolioShell.hidden = true;
+  // Direct visits always show the language entry screen.
+  // Internal returns from the technical essay preserve the selected language
+  // and return directly to the portfolio.
+  const params = new URLSearchParams(window.location.search);
+  const returningFromEssay = params.get('from') === 'essay';
+
+  let savedLang = null;
+  try {
+    const saved = localStorage.getItem('cjm-lang');
+    if (saved === 'es' || saved === 'en') savedLang = saved;
+  } catch(e){}
+
+  if (returningFromEssay && savedLang) {
+    setLang(savedLang);
+    entryScreen.hidden = true;
+    portfolioShell.hidden = false;
+
+    // Remove the internal navigation marker from the visible URL.
+    history.replaceState({}, '', window.location.pathname + window.location.hash);
+  } else {
+    entryScreen.hidden = false;
+    portfolioShell.hidden = true;
+  }
 })();
 </script>
 </div>
