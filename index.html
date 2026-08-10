@@ -315,9 +315,90 @@ footer{
   .hero h1{font-size:clamp(39px,12vw,48px)}
   .section{padding:44px 0 52px}
 }
+
+/* LANGUAGE GATE */
+.lang-gate{
+  position:fixed;
+  inset:0;
+  z-index:120;
+  display:grid;
+  place-items:center;
+  padding:
+    max(24px,env(safe-area-inset-top))
+    max(24px,env(safe-area-inset-right))
+    max(24px,env(safe-area-inset-bottom))
+    max(24px,env(safe-area-inset-left));
+  background:#f5f3ee;
+}
+.lang-gate[hidden]{display:none}
+.lang-gate-inner{
+  width:min(100%,560px);
+  text-align:center;
+}
+.lang-gate-kicker{
+  margin-bottom:22px;
+  font:500 10px/1.4 'IBM Plex Mono',monospace;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#e51a0d;
+}
+.lang-gate-title{
+  margin:0;
+  font:400 clamp(42px,9vw,72px)/.98 'Instrument Serif',Georgia,serif;
+  letter-spacing:-.02em;
+}
+.lang-gate-copy{
+  max-width:34rem;
+  margin:22px auto 0;
+  font:400 13px/1.8 'IBM Plex Mono',monospace;
+  color:rgba(22,21,15,.62);
+}
+.lang-gate-actions{
+  width:min(100%,360px);
+  margin:34px auto 0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.lang-gate-btn{
+  min-height:54px;
+  border:1px solid rgba(22,21,15,.22);
+  background:transparent;
+  color:#16150f;
+  cursor:pointer;
+  font:500 11px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.lang-gate-btn:hover,
+.lang-gate-btn:focus-visible{
+  border-color:#e51a0d;
+  color:#e51a0d;
+  outline:none;
+}
+@media (max-width:520px){
+  .lang-gate-actions{
+    grid-template-columns:1fr;
+    width:min(100%,320px);
+  }
+}
+
 </style>
 </head>
 <body>
+
+<div class="lang-gate" id="langGate" hidden>
+  <div class="lang-gate-inner">
+    <div class="lang-gate-kicker">Christian J. Medina Díaz</div>
+    <h1 class="lang-gate-title">Choose your language.<br><em>Selecciona tu idioma.</em></h1>
+    <p class="lang-gate-copy">You can change it anytime from the menu. Puedes cambiarlo en cualquier momento desde el menú.</p>
+    <div class="lang-gate-actions">
+      <button class="lang-gate-btn" data-gate-lang="en">English</button>
+      <button class="lang-gate-btn" data-gate-lang="es">Español</button>
+    </div>
+  </div>
+</div>
+
 <div id="progress" class="progress"></div>
 
 <header class="header">
@@ -628,6 +709,7 @@ footer{
   const openMenu = document.getElementById('openMenu');
   const closeMenu = document.getElementById('closeMenu');
   const footNote = document.getElementById('footNote');
+  const langGate = document.getElementById('langGate');
 
   function setLang(lang){
     const es = lang === 'es';
@@ -670,18 +752,29 @@ footer{
   closeMenu.addEventListener('click', closeMobile);
   mobileSheet.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobile));
   document.querySelectorAll('[data-lang]').forEach(btn => btn.addEventListener('click', () => setLang(btn.dataset.lang)));
+  document.querySelectorAll('[data-gate-lang]').forEach(btn => btn.addEventListener('click', () => {
+    setLang(btn.dataset.gateLang);
+    langGate.hidden = true;
+  }));
 
   window.addEventListener('scroll', () => {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
   }, {passive:true});
 
-  let lang='es';
+  let savedLang = null;
   try {
     const saved = localStorage.getItem('cjm-lang');
-    if(saved === 'es' || saved === 'en') lang=saved;
+    if(saved === 'es' || saved === 'en') savedLang = saved;
   } catch(e){}
-  setLang(lang);
+
+  if(savedLang){
+    setLang(savedLang);
+    langGate.hidden = true;
+  } else {
+    setLang('es');
+    langGate.hidden = false;
+  }
 })();
 </script>
 </body>
