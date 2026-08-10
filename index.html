@@ -883,6 +883,7 @@ footer{
     btn.addEventListener('click', () => {
       const lang = btn.dataset.entryLang;
       setLang(lang);
+      try { sessionStorage.setItem('cjm-entered', '1'); } catch(e){}
       entryScreen.hidden = true;
       portfolioShell.hidden = false;
       window.scrollTo(0,0);
@@ -894,25 +895,23 @@ footer{
     progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
   }, {passive:true});
 
-  // Direct visits always show the language entry screen.
-  // Internal returns from the technical essay preserve the selected language
-  // and return directly to the portfolio.
-  const params = new URLSearchParams(window.location.search);
-  const returningFromEssay = params.get('from') === 'essay';
-
+  // Entry behavior:
+  // - Fresh tab/session => show language selection.
+  // - Once language is selected, internal navigation and reloads in this tab
+  //   return directly to the portfolio using the saved language.
   let savedLang = null;
+  let hasEntered = false;
+
   try {
     const saved = localStorage.getItem('cjm-lang');
     if (saved === 'es' || saved === 'en') savedLang = saved;
+    hasEntered = sessionStorage.getItem('cjm-entered') === '1';
   } catch(e){}
 
-  if (returningFromEssay && savedLang) {
+  if (hasEntered && savedLang) {
     setLang(savedLang);
     entryScreen.hidden = true;
     portfolioShell.hidden = false;
-
-    // Remove the internal navigation marker from the visible URL.
-    history.replaceState({}, '', window.location.pathname + window.location.hash);
   } else {
     entryScreen.hidden = false;
     portfolioShell.hidden = true;
