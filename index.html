@@ -97,8 +97,8 @@ main{
 }
 .hero{
   padding:110px 0 92px;
-  display:grid;grid-template-columns:minmax(0,1fr) 176px;
-  gap:56px;align-items:start;
+  display:grid;grid-template-columns:minmax(0,1fr) 236px;
+  gap:38px;align-items:center;
 }
 .eyebrow{
   font:500 11px/1 'IBM Plex Mono',monospace;
@@ -204,6 +204,83 @@ footer{
   letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.42)
 }
 
+
+.tech-visual{
+  width:236px;
+  border:1px solid var(--line);
+  padding:18px;
+  background:rgba(241,237,227,.68);
+}
+.tech-visual-label{
+  margin-bottom:12px;
+  font:500 9px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.16em;
+  color:var(--accent);
+  text-align:center;
+}
+.tech-visual-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.tech-logo{
+  min-height:82px;
+  border:1px solid rgba(22,21,15,.10);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:10px 6px;
+  background:rgba(241,237,227,.78);
+}
+.tech-logo img{
+  width:32px;
+  height:32px;
+  object-fit:contain;
+  filter:saturate(.9);
+}
+.tech-logo span{
+  font:500 8.5px/1.2 'IBM Plex Mono',monospace;
+  letter-spacing:.05em;
+  color:rgba(22,21,15,.66);
+  text-align:center;
+}
+.tech-logo-text .mark{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--accent);
+  color:var(--accent);
+  font:500 10px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.08em;
+}
+.tech-flow{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(22,21,15,.10);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  font:500 7.5px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.08em;
+  color:rgba(22,21,15,.55);
+}
+.tech-flow b{
+  color:var(--accent);
+  font-weight:500;
+}
+
+
+/* Desktop hero visual alignment */
+@media (min-width:768px){
+  .tech-visual{
+    transform:translateX(-12px);
+  }
+}
+
 /* MOBILE */
 @media (max-width:767px){
   .header-inner{
@@ -287,6 +364,18 @@ footer{
   .hero-actions .btn-link{width:auto;align-self:center;min-height:auto;margin-top:2px}
   .status{max-width:320px;margin:26px auto 0;justify-content:center;text-align:center}
   .portrait{width:min(54vw,200px);height:auto;aspect-ratio:4/5;margin:0 auto}
+  .tech-visual{
+    width:min(100%,340px);
+    margin:0 auto;
+    padding:18px;
+  }
+  .tech-visual-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .tech-logo{
+    min-height:82px;
+  }
+
 
   .section{
     width:min(100%,560px);margin:0 auto;
@@ -493,7 +582,20 @@ footer{
       <div class="status"><span class="status-dot"></span>San Juan, Puerto Rico · Open to remote roles</div>
     </div>
   </div>
-  <div class="portrait"><img src="portrait.webp" alt="Christian J. Medina Díaz"></div>
+  <div class="tech-visual" aria-label="Core technologies">
+    <div class="tech-visual-label">CORE STACK</div>
+    <div class="tech-visual-grid">
+      <div class="tech-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="Python"><span>Python</span></div>
+      <div class="tech-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg" alt="PostgreSQL"><span>PostgreSQL</span></div>
+      <div class="tech-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg" alt="MySQL"><span>MySQL</span></div>
+      <div class="tech-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt="AWS"><span>AWS</span></div>
+      <div class="tech-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg" alt="Git"><span>Git</span></div>
+      <div class="tech-logo tech-logo-text"><span class="mark">BI</span><span>Power BI</span></div>
+    </div>
+    <div class="tech-flow">
+      <span>INGEST</span><b>→</b><span>MODEL</span><b>→</b><span>ANALYZE</span>
+    </div>
+  </div>
 </section>
 
 <div data-es>
