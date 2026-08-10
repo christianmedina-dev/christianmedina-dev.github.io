@@ -37,6 +37,12 @@
   --page:1080px;
 }
 *{box-sizing:border-box}
+
+/* The hidden attribute must always override layout display rules.
+   This keeps ES/EN navigation and content mutually exclusive. */
+[hidden]{
+  display:none !important;
+}
 html{scroll-behavior:smooth}
 body{
   margin:0;
