@@ -2,1046 +2,687 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Christian J. Medina Díaz — Software Engineer · Data & Cloud</title>
 <meta name="description" content="Ingeniero de software especializado en sistemas de datos y pipelines en la nube (AWS). Backend, PostgreSQL y visualización. San Juan, Puerto Rico — disponible para posiciones remotas.">
 <meta name="author" content="Christian J. Medina Díaz">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Christian J. Medina Díaz — Software Engineer · Data & Cloud">
-<meta property="og:description" content="Ingeniero de software especializado en sistemas de datos y pipelines en la nube (AWS). Backend, PostgreSQL y visualización. San Juan, Puerto Rico — disponible para posiciones remotas.">
 <meta property="og:url" content="https://christianmedina-dev.github.io/">
 <meta name="twitter:card" content="summary">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet data-dc-atomics>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+:root{
+  --bg:#f5f3ee;
+  --ink:#16150f;
+  --accent:#e51a0d;
+  --muted:rgba(22,21,15,.68);
+  --soft:rgba(22,21,15,.45);
+  --line:rgba(22,21,15,.14);
+  --page:1080px;
+}
+*{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:#f5f3ee;color:#16150f;-webkit-font-smoothing:antialiased}
-a{color:#16150f;text-decoration:none}
-a:hover{color:#e51a0d}
-::selection{background:#e51a0d;color:#f5f3ee}
-@media (max-width:760px){
-  main{padding:0 20px !important}
-  header>div{padding:13px 20px !important;gap:12px !important}
-  header nav,header>div>div{gap:14px !important}
-  main>section:first-of-type{padding:64px 0 56px !important;grid-template-columns:1fr !important;gap:30px !important}
-  section[style*="grid-template-columns:150px"]{grid-template-columns:1fr !important;gap:14px !important;padding-top:48px !important;padding-bottom:56px !important}
-  div[style*="grid-template-columns:132px"],div[style*="grid-template-columns:150px 1fr"]{grid-template-columns:1fr !important;gap:2px !important}
-  li[style*="grid-template-columns:16px"]{grid-template-columns:14px 1fr !important}
-  h1{font-size:clamp(34px,10vw,46px) !important}
-  a[style*="padding:14px"]{flex:1 1 auto;justify-content:center;text-align:center;min-height:44px;display:inline-flex !important;align-items:center}
-  footer{flex-direction:column !important;gap:8px !important}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'IBM Plex Mono',ui-monospace,monospace;
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
 }
-@media (max-width:420px){
-  div[style*="grid-template-columns:repeat(2,1fr)"]{grid-template-columns:1fr !important}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+img{display:block;max-width:100%}
+::selection{background:var(--accent);color:var(--bg)}
+
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0;
+  background:var(--accent);z-index:100;
 }
-html,body{max-width:100%;overflow-x:hidden}
-*{min-width:0}
-@media (max-width:760px){
-  [style*="max-width:1080px"]{padding-left:20px !important;padding-right:20px !important}
-  [style*="display:grid"]{grid-template-columns:1fr !important}
-  li[style*="grid-template-columns:16px"]{grid-template-columns:14px 1fr !important}
-  [style*="white-space:nowrap"]{white-space:normal !important}
-  [style*="max-width:640px"],[style*="max-width:580px"],[style*="max-width:430px"],[style*="width:176px"]{max-width:100% !important}
-  [style*="width:176px"]{width:100% !important;max-width:220px !important}
-  [data-parallax]{transform:none !important}
-  h1{font-size:clamp(32px,9vw,44px) !important;word-break:break-word}
-  footer{flex-direction:column !important;align-items:flex-start !important}
+
+.header{
+  position:sticky;top:0;z-index:90;
+  padding-top:env(safe-area-inset-top);
+  background:rgba(245,243,238,.94);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(22,21,15,.12);
 }
-@keyframes cmRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.header-inner{
+  max-width:var(--page);margin:0 auto;
+  padding:17px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:24px;
+}
+.brand{
+  font:500 11px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.desktop-nav{display:flex;align-items:center;gap:26px}
+.desktop-links{display:flex;gap:22px;font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+.desktop-links a{color:rgba(22,21,15,.62)}
+.lang-switch{display:flex;gap:9px;border-left:1px solid rgba(22,21,15,.16);padding-left:22px}
+.lang-switch button,.mobile-lang button{
+  border:0;background:none;cursor:pointer;padding:0;
+  font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;
+}
+.mobile-trigger{display:none}
 
-/* =========================================================
-   MOBILE REDESIGN
-   Native, browser-safe layout for Chrome/Safari on iOS/Android
-   ========================================================= */
+.mobile-sheet{display:none}
 
-.mobile-menu{display:none}
+main{
+  max-width:var(--page);margin:0 auto;padding:0 40px;
+}
+.hero{
+  padding:110px 0 92px;
+  display:grid;grid-template-columns:minmax(0,1fr) 176px;
+  gap:56px;align-items:start;
+}
+.eyebrow{
+  font:500 11px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:30px;
+}
+.hero h1{
+  margin:0;
+  font:400 clamp(48px,7.4vw,92px)/.94 'Instrument Serif',Georgia,serif;
+  letter-spacing:-.015em;
+}
+.hero-copy{
+  margin:34px 0 0;
+  max-width:430px;
+  font:400 15px/1.85 'IBM Plex Mono',monospace;
+  color:rgba(22,21,15,.7);
+}
+.hero-actions{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:40px;
+}
+.btn{
+  min-height:44px;
+  padding:14px 22px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font:500 10px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.btn-primary{background:var(--ink);color:var(--bg)}
+.btn-outline{border:1px solid rgba(22,21,15,.28)}
+.btn-link{padding-left:6px;padding-right:6px;color:rgba(22,21,15,.55);border-bottom:1px solid rgba(22,21,15,.25)}
+.status{
+  margin-top:34px;display:flex;align-items:center;gap:9px;
+  font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5)
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:0 0 6px}
+.portrait{width:176px;height:220px;border:1px solid var(--line);overflow:hidden}
+.portrait img{width:100%;height:100%;object-fit:cover;transform:translate(4.76px,5.08px) scale(1.095)}
 
+.section{
+  border-top:1px solid var(--line);
+  padding:64px 0 76px;
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:40px;
+  scroll-margin-top:84px;
+}
+.section-label{
+  font:500 10px/1.6 'IBM Plex Mono',monospace;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--soft)
+}
+.section-body{max-width:640px}
+.lead{
+  margin:0;
+  font:400 clamp(22px,2.6vw,30px)/1.45 'Instrument Serif',Georgia,serif
+}
+.body-copy{
+  margin:20px 0 0;
+  font:400 14px/1.9 'IBM Plex Mono',monospace;color:var(--muted)
+}
+.body-copy.first{margin-top:26px}
+.skills{margin-top:44px}
+.skill-row{
+  display:grid;grid-template-columns:132px minmax(0,1fr);gap:20px;
+  padding:15px 0;border-top:1px solid rgba(22,21,15,.12);
+  font:400 13px/1.7 'IBM Plex Mono',monospace
+}
+.skill-row:last-child{border-bottom:1px solid rgba(22,21,15,.12)}
+.skill-label{color:var(--soft);letter-spacing:.06em}
+
+.entry-stack{display:flex;flex-direction:column;gap:52px}
+.entry-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.entry-title{margin:0;font:400 clamp(26px,3vw,34px)/1.2 'Instrument Serif',Georgia,serif}
+.entry-date{font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);white-space:nowrap}
+.role{
+  margin-top:12px;
+  font:500 10px/1.6 'IBM Plex Mono',monospace;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--accent)
+}
+.meta{margin-top:5px;font:400 11px/1.6 'IBM Plex Mono',monospace;color:var(--soft)}
+.metrics{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1px;margin-top:26px;background:var(--line);border:1px solid var(--line)
+}
+.metric{background:var(--bg);padding:18px 16px}
+.metric-value{font:400 clamp(26px,3.4vw,36px)/1 'Instrument Serif',Georgia,serif;color:var(--accent)}
+.metric-label{margin-top:9px;font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.5)}
+.bullets{margin:24px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:var(--muted)}
+.bullets li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:4px}
+.dash{color:var(--accent)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.tag{padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)}
+
+.contact-links{margin-top:34px;display:flex;flex-direction:column}
+.contact-links a{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:20px 0;border-top:1px solid var(--line);
+  font:400 15px/1 'IBM Plex Mono',monospace
+}
+.contact-links a:last-child{border-bottom:1px solid var(--line)}
+
+footer{
+  padding:40px 0 56px;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;
+  font:400 10px/1.6 'IBM Plex Mono',monospace;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.42)
+}
+
+/* MOBILE */
 @media (max-width:767px){
-  :root{
-    --mobile-pad:22px;
-    --mobile-max:560px;
-  }
-
-  html,body{
-    width:100%;
-    max-width:100%;
-    overflow-x:hidden;
-  }
-
-  body{
-    -webkit-text-size-adjust:100%;
-    text-size-adjust:100%;
-  }
-
-  .site-header{
-    padding-top:env(safe-area-inset-top);
-    background:rgba(245,243,238,.95) !important;
-  }
-
   .header-inner{
-    width:100% !important;
-    max-width:none !important;
-    min-height:62px;
     padding:
-      8px max(var(--mobile-pad),env(safe-area-inset-right))
-      8px max(var(--mobile-pad),env(safe-area-inset-left)) !important;
-    gap:12px !important;
+      9px max(20px,env(safe-area-inset-right))
+      9px max(20px,env(safe-area-inset-left));
+    min-height:62px;
   }
-
-  .site-brand{
-    max-width:calc(100vw - 86px);
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-    font-size:9px !important;
-    letter-spacing:.12em !important;
+  .brand{
+    font-size:9px;
+    letter-spacing:.12em;
+    max-width:calc(100vw - 92px);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-
-  .desktop-header-actions{
-    display:none !important;
-  }
-
-  .mobile-menu{
-    display:block;
-    margin-left:auto;
-    position:relative;
-    flex:0 0 auto;
-  }
-
-  .mobile-menu summary{
-    list-style:none;
-    width:46px;
-    height:46px;
-    display:grid;
-    place-items:center;
-    cursor:pointer;
-    border-radius:0;
+  .desktop-nav{display:none}
+  .mobile-trigger{
+    display:grid;place-items:center;
+    width:44px;height:44px;flex:0 0 44px;
+    border:0;background:none;padding:0;cursor:pointer;
     -webkit-tap-highlight-color:transparent;
   }
-
-  .mobile-menu summary::-webkit-details-marker{
-    display:none;
+  .hamburger,.hamburger::before,.hamburger::after{
+    width:24px;height:1.5px;background:var(--ink);content:"";display:block;position:relative
   }
-
-  .menu-icon,
-  .menu-icon::before,
-  .menu-icon::after{
-    display:block;
-    width:22px;
-    height:1.5px;
-    background:#16150f;
-    content:"";
-    transition:transform .22s ease, opacity .22s ease;
+  .hamburger::before{position:absolute;top:-7px}
+  .hamburger::after{position:absolute;top:7px}
+  .mobile-sheet{
+    position:fixed;inset:0;z-index:95;
+    background:rgba(245,243,238,.985);
+    padding-top:calc(env(safe-area-inset-top) + 72px);
+    padding-left:max(24px,env(safe-area-inset-left));
+    padding-right:max(24px,env(safe-area-inset-right));
+    padding-bottom:max(24px,env(safe-area-inset-bottom));
   }
-
-  .menu-icon{
-    position:relative;
+  .mobile-sheet.open{display:block}
+  .mobile-sheet-inner{max-width:560px;margin:0 auto}
+  .mobile-sheet a{
+    display:flex;justify-content:space-between;align-items:center;
+    min-height:58px;border-bottom:1px solid rgba(22,21,15,.12);
+    font:500 12px/1.2 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase
   }
-
-  .menu-icon::before{
-    position:absolute;
-    top:-7px;
-    left:0;
-  }
-
-  .menu-icon::after{
-    position:absolute;
-    top:7px;
-    left:0;
-  }
-
-  .mobile-menu[open] .menu-icon{
-    background:transparent;
-  }
-
-  .mobile-menu[open] .menu-icon::before{
-    transform:translateY(7px) rotate(45deg);
-  }
-
-  .mobile-menu[open] .menu-icon::after{
-    transform:translateY(-7px) rotate(-45deg);
-  }
-
-  .mobile-menu-panel{
-    position:absolute;
-    top:54px;
-    right:calc(-1 * max(var(--mobile-pad),env(safe-area-inset-right)));
-    width:min(88vw,360px);
-    padding:16px 22px 20px;
-    background:#f5f3ee;
-    border:1px solid rgba(22,21,15,.14);
-    box-shadow:0 20px 50px rgba(22,21,15,.10);
-  }
-
-  .mobile-menu-panel a{
-    display:block;
-    padding:15px 0;
-    border-bottom:1px solid rgba(22,21,15,.10);
-    font:500 11px/1.2 'IBM Plex Mono',monospace;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-  }
-
+  .mobile-sheet a::after{content:"→";color:var(--accent)}
   .mobile-lang{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding-top:18px;
-    font:500 11px/1 'IBM Plex Mono',monospace;
-    letter-spacing:.12em;
+    display:flex;gap:14px;align-items:center;padding-top:24px
   }
-
   .mobile-lang button{
-    border:0;
-    background:none;
-    padding:5px 0;
-    font:inherit;
-    cursor:pointer;
-    text-decoration:underline;
-    text-underline-offset:4px;
+    min-width:44px;min-height:44px;
+    font-size:11px;
+  }
+  .close-menu{
+    position:absolute;
+    top:calc(env(safe-area-inset-top) + 9px);
+    right:max(20px,env(safe-area-inset-right));
+    width:44px;height:44px;border:0;background:none;font-size:26px;cursor:pointer
   }
 
-  .site-main{
-    width:100% !important;
-    max-width:none !important;
-    margin:0 !important;
-    padding:
-      0 max(var(--mobile-pad),env(safe-area-inset-right))
-      0 max(var(--mobile-pad),env(safe-area-inset-left)) !important;
+  main{
+    width:100%;max-width:none;padding:
+      0 max(20px,env(safe-area-inset-right))
+      0 max(20px,env(safe-area-inset-left));
   }
-
-  /* Hero: designed as a single deliberate mobile composition */
   .hero{
-    width:min(100%,var(--mobile-max));
-    margin:0 auto;
-    padding:58px 0 64px !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    gap:34px !important;
-    text-align:center;
+    width:min(100%,560px);margin:0 auto;
+    padding:54px 0 60px;
+    display:flex;flex-direction:column;align-items:center;gap:34px;text-align:center
   }
-
-  .hero > div:first-child{
-    width:100%;
+  .eyebrow{margin-bottom:20px}
+  .hero h1{
+    max-width:9.5ch;margin:0 auto;
+    font-size:clamp(42px,12.8vw,56px);line-height:.95;letter-spacing:-.02em
   }
-
-  .hero-eyebrow{
-    margin-bottom:20px !important;
-    text-align:center;
-  }
-
-  .hero-title{
-    margin:0 auto !important;
-    max-width:10ch;
-    font-size:clamp(44px,13vw,58px) !important;
-    line-height:.94 !important;
-    letter-spacing:-.02em !important;
-    text-align:center;
-    word-break:normal !important;
-  }
-
   .hero-copy{
-    max-width:31rem !important;
-    margin:26px auto 0 !important;
-    font-size:13px !important;
-    line-height:1.8 !important;
-    text-align:center;
+    max-width:31rem;margin:26px auto 0;
+    font-size:13px;line-height:1.8;text-align:center
   }
-
-  .hero-cta{
-    width:min(100%,340px);
-    margin:30px auto 0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:stretch !important;
-    gap:10px !important;
+  .hero-actions{
+    width:min(100%,340px);margin:30px auto 0;
+    flex-direction:column;align-items:stretch
   }
+  .hero-actions .btn{width:100%;min-height:50px}
+  .hero-actions .btn-link{width:auto;align-self:center;min-height:auto;margin-top:2px}
+  .status{max-width:320px;margin:26px auto 0;justify-content:center;text-align:center}
+  .portrait{width:min(54vw,200px);height:auto;aspect-ratio:4/5;margin:0 auto}
 
-  .hero-cta > a{
-    width:100% !important;
-    min-height:50px;
-    margin:0 !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    padding:14px 18px !important;
-    text-align:center !important;
+  .section{
+    width:min(100%,560px);margin:0 auto;
+    padding:48px 0 58px;
+    display:flex;flex-direction:column;gap:22px
   }
+  .section-label{text-align:center}
+  .section-body{width:100%;max-width:520px;margin:0 auto}
+  .lead{text-align:center;font-size:clamp(24px,7.4vw,32px)}
+  .body-copy{text-align:left}
+  .skills{margin-top:36px}
+  .skill-row{grid-template-columns:1fr;gap:5px;text-align:center;padding:17px 0}
+  .skill-label{text-transform:uppercase;font-size:10px;letter-spacing:.12em}
 
-  .hero-cta > a:last-child{
-    width:auto !important;
-    min-height:0;
-    align-self:center;
-    padding:12px 4px 4px !important;
-  }
+  .entry-stack{gap:46px}
+  .entry-head{flex-direction:column;align-items:center;gap:8px;text-align:center}
+  .entry-title{font-size:clamp(26px,8vw,34px);line-height:1.14;text-align:center}
+  .entry-date{white-space:normal}
+  .role,.meta{text-align:center}
+  .metrics{width:min(100%,360px);margin:24px auto 0;grid-template-columns:1fr}
+  .metric{text-align:center;padding:20px 16px}
+  .bullets{width:min(100%,500px);margin-left:auto;margin-right:auto;text-align:left;font-size:13px}
+  .bullets li{grid-template-columns:14px minmax(0,1fr);gap:7px}
+  .tags{justify-content:center}
+  .contact-links{width:min(100%,500px);margin-left:auto;margin-right:auto}
+  .contact-links a{font-size:13px;line-height:1.4;overflow-wrap:anywhere}
 
-  .hero-status{
-    max-width:330px;
-    margin:26px auto 0 !important;
-    justify-content:center;
-    text-align:center;
-    line-height:1.6 !important;
-  }
-
-  .portrait-wrap{
-    width:100%;
-    align-items:center !important;
-    transform:none !important;
-  }
-
-  .portrait{
-    width:min(54vw,200px) !important;
-    height:auto !important;
-    aspect-ratio:4/5;
-    margin:0 auto;
-  }
-
-  [data-parallax]{
-    transform:none !important;
-  }
-
-  /* Sections: centered framing, readable body */
-  .content-section{
-    width:min(100%,var(--mobile-max));
-    margin:0 auto !important;
-    padding:52px 0 62px !important;
-    display:flex !important;
-    flex-direction:column !important;
-    gap:22px !important;
-    scroll-margin-top:76px;
-  }
-
-  .content-section > div:first-child{
-    width:100%;
-    text-align:center !important;
-  }
-
-  .section-content{
-    width:100%;
-    max-width:520px !important;
-    margin:0 auto !important;
-  }
-
-  .section-content > p:first-child{
-    max-width:30rem;
-    margin-left:auto !important;
-    margin-right:auto !important;
-    text-align:center !important;
-  }
-
-  .section-content > p:not(:first-child){
-    text-align:left !important;
-  }
-
-  .section-stack{
-    gap:48px !important;
-  }
-
-  .entry-head{
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    gap:8px !important;
-    text-align:center !important;
-  }
-
-  .entry-head h3{
-    max-width:28rem;
-    margin:0 auto !important;
-    font-size:clamp(26px,8vw,34px) !important;
-    line-height:1.14 !important;
-    text-align:center !important;
-  }
-
-  .entry-head span{
-    white-space:normal !important;
-    text-align:center;
-  }
-
-  .entry-head + div,
-  .entry-head + div + div{
-    text-align:center !important;
-  }
-
-  .metric-grid{
-    width:min(100%,360px);
-    margin:24px auto 0 !important;
-    grid-template-columns:1fr !important;
-  }
-
-  .metric-grid > div{
-    padding:20px 16px !important;
-    text-align:center;
-  }
-
-  .bullet-list{
-    width:min(100%,500px);
-    margin-left:auto !important;
-    margin-right:auto !important;
-    text-align:left;
-  }
-
-  .bullet-list li{
-    grid-template-columns:14px minmax(0,1fr) !important;
-    gap:7px !important;
-  }
-
-  .skill-row{
-    width:min(100%,500px);
-    margin:0 auto;
-    grid-template-columns:1fr !important;
-    gap:5px !important;
-    padding:17px 0 !important;
-    text-align:center;
-  }
-
-  .skill-row > span:first-child{
-    font-size:10px;
-    letter-spacing:.12em !important;
-    text-transform:uppercase;
-  }
-
-  .tag-list{
-    justify-content:center !important;
-  }
-
-  .content-section div[style*="margin-top:26px"]{
-    text-align:center;
-  }
-
-  .contact-links{
-    width:min(100%,500px);
-    margin-left:auto !important;
-    margin-right:auto !important;
-  }
-
-  .contact-links a{
-    font-size:13px !important;
-    line-height:1.4 !important;
-    overflow-wrap:anywhere;
-  }
-
-  .site-footer{
-    width:min(100%,var(--mobile-max));
-    margin:0 auto;
-    padding:34px 0 max(44px,env(safe-area-inset-bottom)) !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    gap:8px !important;
-    text-align:center;
+  footer{
+    width:min(100%,560px);margin:0 auto;
+    padding:34px 0 max(44px,env(safe-area-inset-bottom));
+    flex-direction:column;align-items:center;text-align:center;gap:8px
   }
 }
 
 @media (max-width:390px){
-  :root{--mobile-pad:18px}
-
-  .hero{
-    padding-top:48px !important;
-  }
-
-  .hero-title{
-    font-size:clamp(40px,12.2vw,49px) !important;
-  }
-
-  .hero-copy{
-    font-size:12.5px !important;
-  }
-
-  .content-section{
-    padding:46px 0 54px !important;
-  }
-
-  .section-stack{
-    gap:42px !important;
-  }
-
-  .mobile-menu-panel{
-    width:min(91vw,340px);
-  }
-}
-
-
-/* ===== MOBILE HEADER + MENU SYMMETRY FIX ===== */
-@media (max-width:767px){
-  :root{
-    --edge-pad:max(22px, env(safe-area-inset-left));
-    --edge-pad-r:max(22px, env(safe-area-inset-right));
-  }
-
   .header-inner{
-    padding-left:var(--edge-pad) !important;
-    padding-right:var(--edge-pad-r) !important;
-    justify-content:space-between !important;
+    padding-left:max(18px,env(safe-area-inset-left));
+    padding-right:max(18px,env(safe-area-inset-right));
   }
-
-  .site-brand{
-    flex:1 1 auto;
-    max-width:none !important;
-    min-width:0;
-    padding-right:14px;
+  main{
+    padding-left:max(18px,env(safe-area-inset-left));
+    padding-right:max(18px,env(safe-area-inset-right));
   }
-
-  .mobile-menu{
-    margin-left:0 !important;
-    flex:0 0 46px;
-  }
-
-  .mobile-menu summary{
-    width:46px;
-    height:46px;
-    margin:0;
-    padding:0;
-    place-items:center;
-  }
-
-  /* Keep the menu icon visually inset by the same edge padding as the brand */
-  .menu-icon,
-  .menu-icon::before,
-  .menu-icon::after{
-    width:24px;
-  }
-
-  /* Full-viewport-safe dropdown: never allowed to bleed off-screen */
-  .mobile-menu-panel{
-    position:fixed !important;
-    top:calc(env(safe-area-inset-top) + 62px) !important;
-    left:max(16px, env(safe-area-inset-left)) !important;
-    right:max(16px, env(safe-area-inset-right)) !important;
-    width:auto !important;
-    max-width:none !important;
-    margin:0 !important;
-    padding:18px 22px 22px !important;
-    max-height:calc(100dvh - env(safe-area-inset-top) - 78px);
-    overflow-y:auto;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
-    z-index:1000;
-  }
-
-  .mobile-menu-panel > div{
-    width:100%;
-  }
-
-  .mobile-menu-panel a{
-    width:100%;
-    min-height:48px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:15px 2px !important;
-    color:#16150f !important;
-    opacity:1 !important;
-    visibility:visible !important;
-  }
-
-  .mobile-menu-panel a::after{
-    content:"→";
-    color:#e51a0d;
-    font-size:13px;
-    margin-left:16px;
-  }
-
-  .mobile-lang{
-    min-height:52px;
-    padding-top:18px !important;
-  }
-
-  .mobile-lang button{
-    min-width:44px;
-    min-height:44px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    color:#16150f;
-    opacity:1;
-  }
+  .hero{padding-top:46px}
+  .hero h1{font-size:clamp(39px,12vw,48px)}
+  .section{padding:44px 0 52px}
 }
+</style>
+</head>
+<body>
+<div id="progress" class="progress"></div>
 
-@media (max-width:390px){
-  :root{
-    --edge-pad:max(18px, env(safe-area-inset-left));
-    --edge-pad-r:max(18px, env(safe-area-inset-right));
-  }
+<header class="header">
+  <div class="header-inner">
+    <a href="#top" class="brand">Christian J. Medina Díaz</a>
 
-  .mobile-menu-panel{
-    left:max(12px, env(safe-area-inset-left)) !important;
-    right:max(12px, env(safe-area-inset-right)) !important;
-    padding-left:18px !important;
-    padding-right:18px !important;
-  }
-}
-
-</style></helmet>
-
-<div style="min-height:100vh;background:#f5f3ee;font-family:'IBM Plex Mono',ui-monospace,monospace;overflow-x:hidden">
-
-  <div ref="{{ bar }}" style="position:fixed;top:0;left:0;height:2px;width:0;background:#e51a0d;z-index:60"></div>
-
-  <header class="site-header" style="position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(245,243,238,.82);border-bottom:1px solid rgba(22,21,15,.12)">
-    <div class="header-inner" style="max-width:1080px;margin:0 auto;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;gap:24px">
-      <a class="site-brand" href="#top" style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase">Christian J. Medina Díaz</a>
-      <div class="desktop-header-actions" style="display:flex;align-items:center;gap:26px">
-        <nav style="display:flex;gap:22px;font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase">
-          <span style="display:{{ dEs }}"><a href="#about" style="color:rgba(22,21,15,.62)">Sobre mí</a></span>
-          <span style="display:{{ dEs }}"><a href="#work" style="color:rgba(22,21,15,.62)">Trayectoria</a></span>
-          <span style="display:{{ dEs }}"><a href="#projects" style="color:rgba(22,21,15,.62)">Proyectos</a></span>
-          <span style="display:{{ dEs }}"><a href="#contact" style="color:rgba(22,21,15,.62)">Contacto</a></span>
-          <span style="display:{{ dEn }}"><a href="#about-en" style="color:rgba(22,21,15,.62)">About</a></span>
-          <span style="display:{{ dEn }}"><a href="#work-en" style="color:rgba(22,21,15,.62)">Experience</a></span>
-          <span style="display:{{ dEn }}"><a href="#projects-en" style="color:rgba(22,21,15,.62)">Projects</a></span>
-          <span style="display:{{ dEn }}"><a href="#contact-en" style="color:rgba(22,21,15,.62)">Contact</a></span>
-        </nav>
-        <div style="display:flex;gap:9px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;border-left:1px solid rgba(22,21,15,.16);padding-left:22px">
-          <button onClick="{{ setEs }}" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:{{ cEs }};text-decoration:underline;text-underline-offset:4px;text-decoration-color:{{ uEs }}">ES</button>
-          <button onClick="{{ setEn }}" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:{{ cEn }};text-decoration:underline;text-underline-offset:4px;text-decoration-color:{{ uEn }}">EN</button>
-        </div>
+    <div class="desktop-nav">
+      <nav class="desktop-links" data-nav-es>
+        <a href="#about">Sobre mí</a><a href="#work">Trayectoria</a><a href="#projects">Proyectos</a><a href="#contact">Contacto</a>
+      </nav>
+      <nav class="desktop-links" data-nav-en hidden>
+        <a href="#about-en">About</a><a href="#work-en">Experience</a><a href="#projects-en">Projects</a><a href="#contact-en">Contact</a>
+      </nav>
+      <div class="lang-switch">
+        <button data-lang="es">ES</button>
+        <button data-lang="en">EN</button>
       </div>
-      <details class="mobile-menu">
-        <summary aria-label="Open navigation">
-          <span class="menu-icon" aria-hidden="true"></span>
-        </summary>
-        <div class="mobile-menu-panel">
-          <div style="display:{{ dEs }}">
-            <a href="#about">Sobre mí</a>
-            <a href="#work">Trayectoria</a>
-            <a href="#projects">Proyectos</a>
-            <a href="#contact">Contacto</a>
-          </div>
-          <div style="display:{{ dEn }}">
-            <a href="#about-en">About</a>
-            <a href="#work-en">Experience</a>
-            <a href="#projects-en">Projects</a>
-            <a href="#contact-en">Contact</a>
-          </div>
-          <div class="mobile-lang">
-            <button onClick="{{ setEs }}" style="color:{{ cEs }};text-decoration-color:{{ uEs }}">ES</button>
-            <span>/</span>
-            <button onClick="{{ setEn }}" style="color:{{ cEn }};text-decoration-color:{{ uEn }}">EN</button>
-          </div>
-        </div>
-      </details>
-    </div>
-  </header>
-
-  <main id="top" class="site-main" style="max-width:1080px;margin:0 auto;padding:0 40px">
-
-    <section class="hero" style="padding:110px 0 92px;display:grid;grid-template-columns:1fr 176px;gap:56px;align-items:start">
-      <div>
-        <div class="hero-lang" style="display:{{ dEs }}">
-          <div class="hero-eyebrow" data-anim="1" style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:#e51a0d;margin-bottom:30px">Software Engineer · Data &amp; Cloud</div>
-          <h1 class="hero-title" data-anim="2" data-parallax="0.06" style="margin:0;font:400 clamp(48px,7.4vw,92px)/.94 'Instrument Serif',Georgia,serif;letter-spacing:-.015em">Sistemas de datos<br><em>que escalan.</em></h1>
-          <p class="hero-copy" data-anim="3" style="margin:34px 0 0;font:400 15px/1.85 'IBM Plex Mono',monospace;color:rgba(22,21,15,.7);max-width:430px;text-wrap:pretty">Backend, bases de datos relacionales y pipelines de datos en la nube. Trabajo con más de cinco millones de registros — de la ingesta al dashboard.</p>
-          <div class="hero-cta" data-anim="4" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:40px">
-            <a href="cv/Christian-Medina-CV.pdf" download="Christian-Medina-CV.pdf" style="padding:14px 22px;background:#16150f;color:#f5f3ee;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),background .35s" style-hover="transform:translateY(-2px);background:#e51a0d;color:#f5f3ee">Descargar CV ↓</a>
-            <a href="mailto:cjmedina99@gmail.com" style="padding:14px 22px;border:1px solid rgba(22,21,15,.28);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s" style-hover="transform:translateY(-2px);border-color:#e51a0d">Escríbeme</a>
-            <a href="#projects" style="align-self:center;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:rgba(22,21,15,.55);border-bottom:1px solid rgba(22,21,15,.25);padding-bottom:3px;margin-left:6px" style-hover="color:#e51a0d;border-color:#e51a0d">Ver proyectos ↓</a>
-          </div>
-          <div class="hero-status" data-anim="5" style="margin-top:34px;font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);display:flex;align-items:center;gap:9px">
-            <span style="width:6px;height:6px;border-radius:99px;background:#e51a0d"></span>San Juan, Puerto Rico · Disponible para posiciones remotas
-          </div>
-        </div>
-        <div class="hero-lang" style="display:{{ dEn }}">
-          <div class="hero-eyebrow" data-anim="1" style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:#e51a0d;margin-bottom:30px">Software Engineer · Data &amp; Cloud</div>
-          <h1 class="hero-title" data-anim="2" data-parallax="0.06" style="margin:0;font:400 clamp(48px,7.4vw,92px)/.94 'Instrument Serif',Georgia,serif;letter-spacing:-.015em">Data systems<br><em>built to scale.</em></h1>
-          <p class="hero-copy" data-anim="3" style="margin:34px 0 0;font:400 15px/1.85 'IBM Plex Mono',monospace;color:rgba(22,21,15,.7);max-width:430px;text-wrap:pretty">Backend, relational databases and cloud data pipelines. I work with datasets of five million-plus records — from ingestion to dashboard.</p>
-          <div class="hero-cta" data-anim="4" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:40px">
-            <a href="cv/Christian-Medina-CV.pdf" download="Christian-Medina-CV.pdf" style="padding:14px 22px;background:#16150f;color:#f5f3ee;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),background .35s" style-hover="transform:translateY(-2px);background:#e51a0d;color:#f5f3ee">Download CV ↓</a>
-            <a href="mailto:cjmedina99@gmail.com" style="padding:14px 22px;border:1px solid rgba(22,21,15,.28);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s" style-hover="transform:translateY(-2px);border-color:#e51a0d">Get in touch</a>
-            <a href="#projects-en" style="align-self:center;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:rgba(22,21,15,.55);border-bottom:1px solid rgba(22,21,15,.25);padding-bottom:3px;margin-left:6px" style-hover="color:#e51a0d;border-color:#e51a0d">See projects ↓</a>
-          </div>
-          <div class="hero-status" data-anim="5" style="margin-top:34px;font:400 11px/1.7 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);display:flex;align-items:center;gap:9px">
-            <span style="width:6px;height:6px;border-radius:99px;background:#e51a0d"></span>San Juan, Puerto Rico · Open to remote roles
-          </div>
-        </div>
-      </div>
-      <div class="portrait-wrap" data-anim="3" data-parallax="-0.05" style="display:flex;flex-direction:column;gap:10px">
-        <div class="portrait" style="width:176px;height:220px;border:1px solid rgba(22,21,15,.14);overflow:hidden"><img src="portrait.webp" alt="Christian J. Medina Díaz" style="width:100%;height:100%;object-fit:cover;display:block;transform:translate(4.76px,5.08px) scale(1.095)"></div>
-        
-      </div>
-    </section>
-
-    <div style="display:{{ dEs }}">
-      <section id="about" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 76px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">01 — Sobre mí</div>
-        <div class="section-content" style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(22px,2.6vw,30px)/1.45 'Instrument Serif',Georgia,serif;text-wrap:pretty">Me interesa el momento en que un sistema deja de <em>soportar</em> los datos y empieza a aprovecharlos.</p>
-          <p data-reveal style="margin:26px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">Soy Software Engineer, egresado de la Universidad de Puerto Rico, Recinto de Mayagüez. Mi trabajo vive en el backend: diseñar el esquema correcto, escribir la consulta que corre en segundos en vez de minutos, y mover los datos desde la ingesta hasta el dashboard sin que se rompan en el camino.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">Hoy, en Innovatio, trabajo con conjuntos de datos de más de cinco millones de registros en AWS, cuidando rendimiento, escalabilidad y costo. También construyo la capa de reportería y visualización en Power BI, QuickSight y Streamlit — porque un pipeline solo vale lo que vale la decisión que habilita.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">Antes de eso trabajé en proyectos con equipos de 22 a 27 personas bajo metodología Agile, donde aprendí lo que ningún curso enseña: la parte difícil de un sistema casi nunca es el código, es ponerse de acuerdo en qué significa cada dato. Busco un equipo <em style="font-style:normal;color:#e51a0d">remoto</em> donde seguir creciendo en ingeniería de datos y arquitectura en la nube — y donde lo que construya se use de verdad.</p>
-        <div data-reveal style="margin-top:44px;display:flex;flex-direction:column">
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Lenguajes</span><span>Python · SQL · Java · JavaScript · C/C++</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Nube y datos</span><span>AWS (S3, Athena, RDS, QuickSight) · Pipelines de datos</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">BI y analítica</span><span>Power BI · QuickSight · Streamlit · Matplotlib</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Bases de datos</span><span>PostgreSQL · MySQL · Modelado 3NF · Indexación · Optimización</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);border-bottom:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Backend</span><span>Flask · APIs REST · Arquitectura limpia · SOLID · Agile</span></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="work" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 76px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">02 — Trayectoria</div>
-        <div class="section-content section-stack" style="max-width:640px;display:flex;flex-direction:column;gap:52px">
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(26px,3vw,34px)/1.2 'Instrument Serif',Georgia,serif">Innovatio Software Solutions</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);white-space:nowrap">2026 — hoy</span>
-            </div>
-            <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Ingeniero de Software · Contratista independiente</div>
-            <div class="metric-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin:26px 0 0;background:rgba(22,21,15,.14);border:1px solid rgba(22,21,15,.14)">
-              <div style="background:#f5f3ee;padding:18px 16px"><div style="font:400 clamp(26px,3.4vw,36px)/1 'Instrument Serif',Georgia,serif;color:#e51a0d">5M+</div><div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.5);margin-top:9px">Registros procesados</div></div>
-              <div style="background:#f5f3ee;padding:18px 16px"><div style="font:400 clamp(20px,2.5vw,27px)/1.15 'Instrument Serif',Georgia,serif;color:#e51a0d">min → seg</div><div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.5);margin-top:9px">Tiempo de ingesta</div></div>
-            </div>
-            <ul class="bullet-list" style="margin:24px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Rediseñé la ingesta de <em style="font-style:normal;color:#16150f">volcado completo a refresco incremental</em>, bajando el tiempo de corrida de minutos a segundos y aliviando la carga sobre la base de datos.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Optimicé almacenamiento y consultas para reducir de forma sostenida el costo de operación del pipeline, eliminando trabajo redundante en cada corrida.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Pipelines de extremo a extremo sobre AWS (S3, Athena, RDS) para más de 5 millones de registros, con foco en rendimiento, escalabilidad y costo.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Consultas SQL optimizadas y dashboards en Power BI y QuickSight para decisiones de negocio.</span></li>
-            </ul>
-            <div style="margin-top:26px"><a href="ensayo.html" style="display:inline-flex;align-items:center;gap:10px;padding:14px 20px;border:1px solid rgba(22,21,15,.28);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s" style-hover="transform:translateY(-2px);border-color:#e51a0d">Leer el ensayo técnico<span style="color:#e51a0d">↗</span></a></div>
-
-          </div>
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(26px,3vw,34px)/1.2 'Instrument Serif',Georgia,serif">Universidad de Puerto Rico,<br>Recinto de Mayagüez</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);white-space:nowrap">Dic. 2025</span>
-            </div>
-            <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">B.S. Ciencias e Ingeniería de Computación</div>
-            <p style="margin:20px 0 0;font:400 13.5px/1.85 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">GPA 3.2 / 4.0. Cursos relevantes: Bases de Datos, Ingeniería de Software, Sistemas Operativos, Algoritmos y Redes.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="projects" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 76px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">03 — Proyectos</div>
-        <div class="section-content section-stack" style="max-width:640px;display:flex;flex-direction:column;gap:52px">
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(24px,2.8vw,32px)/1.22 'Instrument Serif',Georgia,serif;text-wrap:pretty">Sports &amp; Exercise Management System</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.4);white-space:nowrap">01</span>
-            </div>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Líder de backend e ingeniería de datos</div>
-            <div style="font:400 11px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45);margin-top:5px">Proyecto de capstone · equipo de 3 personas</div>
-            <ul class="bullet-list" style="margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Diseñé e implementé más de 15 endpoints REST para gestionar usuarios, rutinas y métricas de rendimiento.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Modelé y normalicé el esquema de PostgreSQL a tercera forma normal, reduciendo redundancia y protegiendo la integridad de los datos.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Con indexación y consultas optimizadas mejoré el rendimiento de la reportería en aproximadamente <em style="font-style:normal;color:#16150f">30%</em>.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Integré un chatbot con modelo de lenguaje que permite consultar datos relacionales en lenguaje natural.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Desplegué el sistema completo en Heroku con migraciones y configuración por ambiente.</span></li>
-            </ul>
-            <div class="tag-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:18px"><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Python</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Flask</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">PostgreSQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">SQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Streamlit</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Ollama 3.1</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Heroku</span></div>
-          </div>
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(24px,2.8vw,32px)/1.22 'Instrument Serif',Georgia,serif;text-wrap:pretty">NBA Relational Database Analysis</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.4);white-space:nowrap">02</span>
-            </div>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Modelado de datos y SQL avanzado</div>
-            <div style="font:400 11px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45);margin-top:5px">Proyecto personal</div>
-            <ul class="bullet-list" style="margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Diseñé una base de datos relacional multi-temporada en PostgreSQL para análisis estadístico complejo.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Apliqué normalización, llaves foráneas y optimización de esquema para mantener la integridad referencial.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Desarrollé consultas avanzadas con uniones, agregaciones y subconsultas para métricas de rendimiento.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Ejecuté validación estructurada de datos para garantizar exactitud analítica.</span></li>
-            </ul>
-            <div class="tag-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:18px"><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">PostgreSQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">SQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Python</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Git</span></div>
-          </div>
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(24px,2.8vw,32px)/1.22 'Instrument Serif',Georgia,serif;text-wrap:pretty">Gamified Gym</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.4);white-space:nowrap">03</span>
-            </div>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Desarrollador full-stack móvil</div>
-            <div style="font:400 11px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45);margin-top:5px">Proyecto de diseño de software · equipo de 27 personas</div>
-            <ul class="bullet-list" style="margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Construí una aplicación móvil en React Native siguiendo arquitectura limpia y principios SOLID.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Modelé entidades de dominio y contextos delimitados para separar presentación, lógica de negocio y datos.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Integré autenticación y servicios de base de datos con Supabase, incluyendo navegación protegida por rol.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Traduje diseños de Figma en componentes reutilizables para varios módulos del producto.</span></li>
-            </ul>
-            <div class="tag-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:18px"><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">React Native</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Expo</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Supabase</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">JavaScript</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Figma</span></div>
-          </div>
-          <div data-reveal>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,15,.45);margin-bottom:4px">También</div>
-            <div style="display:flex;flex-direction:column;gap:6px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 19px/1.3 'Instrument Serif',Georgia,serif">EconQuest — Plataforma de aprendizaje con roles</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Arquitectura modular de backend con control de acceso para administradores, estudiantes y docentes. Lideré el módulo de estudiante: autenticación segura, operaciones transaccionales y dashboards de participación. Equipo de más de 25 personas bajo Scrum.</p>
-              <div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.08em;color:rgba(22,21,15,.42);margin-top:2px">Python · Flask · PostgreSQL · Heroku</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:6px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 19px/1.3 'Instrument Serif',Georgia,serif">RegiUPR — Sistema de matrícula universitaria</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Sistema de escritorio para matrícula de cursos desarrollado en un equipo Agile de 22 personas. Implementé registro de usuarios, validación de entradas y recuperación de cuentas, además de la lógica que hace cumplir las reglas de negocio.</p>
-              <div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.08em;color:rgba(22,21,15,.42);margin-top:2px">Python · PyQt5 · Figma · Git</div>
-            </div>
-          </div>
-          <div data-reveal style="border-top:1px solid rgba(22,21,15,.14);padding-top:22px"><a href="https://github.com/christianmedina-dev" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:9px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase">Todo el código en GitHub<span style="color:#e51a0d">↗</span></a></div>
-        </div>
-      </section>
-
-      <section id="contact" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 30px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">04 — Contacto</div>
-        <div class="section-content" style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(26px,3.4vw,40px)/1.3 'Instrument Serif',Georgia,serif;text-wrap:pretty">Abierto a posiciones en <em>ingeniería de datos</em>, backend y nube — con preferencia por equipos <em>remotos</em>.</p>
-          <div class="contact-links" data-reveal style="margin-top:34px;display:flex;flex-direction:column">
-            <a href="mailto:cjmedina99@gmail.com" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-top:1px solid rgba(22,21,15,.14);font:400 15px/1 'IBM Plex Mono',monospace;transition:padding-left .4s cubic-bezier(.2,.8,.2,1)" style-hover="padding-left:10px">cjmedina99@gmail.com<span style="color:#e51a0d">↗</span></a>
-            <a href="https://linkedin.com/in/christian-medina-1a1796198/" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-top:1px solid rgba(22,21,15,.14);font:400 15px/1 'IBM Plex Mono',monospace;transition:padding-left .4s cubic-bezier(.2,.8,.2,1)" style-hover="padding-left:10px">LinkedIn<span style="color:#e51a0d">↗</span></a>
-            <a href="https://github.com/christianmedina-dev" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-top:1px solid rgba(22,21,15,.14);border-bottom:1px solid rgba(22,21,15,.14);font:400 15px/1 'IBM Plex Mono',monospace;transition:padding-left .4s cubic-bezier(.2,.8,.2,1)" style-hover="padding-left:10px">GitHub<span style="color:#e51a0d">↗</span></a>
-          </div>
-        </div>
-      </section>
     </div>
 
-    <div style="display:{{ dEn }}">
-      <section id="about-en" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 76px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">01 — About</div>
-        <div class="section-content" style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(22px,2.6vw,30px)/1.45 'Instrument Serif',Georgia,serif;text-wrap:pretty">What interests me is the moment a system stops merely <em>holding</em> data and starts making use of it.</p>
-          <p data-reveal style="margin:26px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">I'm a Software Engineer, a graduate of the University of Puerto Rico, Mayagüez Campus. My work lives in the backend: designing the right schema, writing the query that runs in seconds instead of minutes, and moving data from ingestion to dashboard without it breaking along the way.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">Today, at Innovatio, I work with datasets of more than five million records on AWS, watching performance, scalability and cost. I've also built reporting and visualization in Power BI, QuickSight and Streamlit — because a pipeline is only worth the decision it enables.</p>
-          <p data-reveal style="margin:20px 0 0;font:400 14px/1.9 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">Before that I shipped projects with 22- to 27-person Agile teams, where I learned what no course teaches: the hard part of a system is rarely the code — it's agreeing on what each piece of data means. I'm looking for a <em style="font-style:normal;color:#e51a0d">remote</em> team where I can keep growing in Data Engineering and Cloud, and where what I build actually gets used.</p>
-          <div data-reveal style="margin-top:44px;display:flex;flex-direction:column">
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Languages</span><span>Python · SQL · Java · JavaScript · C/C++</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Cloud &amp; data</span><span>AWS (S3, Athena, QuickSight) · Data Pipelines</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">BI &amp; analytics</span><span>Power BI · Streamlit · Matplotlib · Data validation</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Databases</span><span>PostgreSQL · MySQL · 3NF modeling · Indexing · Query tuning</span></div>
-            <div class="skill-row" style="display:grid;grid-template-columns:132px 1fr;gap:20px;padding:15px 0;border-top:1px solid rgba(22,21,15,.12);border-bottom:1px solid rgba(22,21,15,.12);font:400 13px/1.7 'IBM Plex Mono',monospace"><span style="color:rgba(22,21,15,.45);letter-spacing:.06em">Backend</span><span>Flask · REST APIs · Clean Architecture · Agile</span></div>
-          </div>
-        </div>
-      </section>
+    <button class="mobile-trigger" id="openMenu" aria-label="Open navigation"><span class="hamburger"></span></button>
+  </div>
+</header>
 
-      <section id="work-en" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 76px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">02 — Experience</div>
-        <div class="section-content section-stack" style="max-width:640px;display:flex;flex-direction:column;gap:52px">
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(26px,3vw,34px)/1.2 'Instrument Serif',Georgia,serif">Innovatio Software Solutions</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);white-space:nowrap">2026 — present</span>
-            </div>
-            <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Software Engineer · Independent contractor</div>
-            <div class="metric-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin:26px 0 0;background:rgba(22,21,15,.14);border:1px solid rgba(22,21,15,.14)">
-              <div style="background:#f5f3ee;padding:18px 16px"><div style="font:400 clamp(26px,3.4vw,36px)/1 'Instrument Serif',Georgia,serif;color:#e51a0d">5M+</div><div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.5);margin-top:9px">Records processed</div></div>
-              <div style="background:#f5f3ee;padding:18px 16px"><div style="font:400 clamp(20px,2.5vw,27px)/1.15 'Instrument Serif',Georgia,serif;color:#e51a0d">min → sec</div><div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.5);margin-top:9px">Ingestion run time</div></div>
-            </div>
-            <ul class="bullet-list" style="margin:24px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Redesigned ingestion from <em style="font-style:normal;color:#16150f">full dump to incremental refresh</em>, taking run time from minutes down to seconds and easing load on the database.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Optimized storage and queries to sustainably reduce the pipeline's operating cost by eliminating redundant work on every run.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">End-to-end pipelines on AWS (S3, Athena, RDS) for 5M+ records, focused on performance, scalability and cost.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Optimized SQL queries and dashboards in Power BI and QuickSight for business decisions.</span></li>
-            </ul>
-            <div style="margin-top:26px"><a href="ensayo.html" style="display:inline-flex;align-items:center;gap:10px;padding:14px 20px;border:1px solid rgba(22,21,15,.28);font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s" style-hover="transform:translateY(-2px);border-color:#e51a0d">Read the technical essay<span style="color:#e51a0d">↗</span></a></div>
-
-          </div>
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(26px,3vw,34px)/1.2 'Instrument Serif',Georgia,serif">University of Puerto Rico,<br>Mayagüez Campus</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.5);white-space:nowrap">Dec. 2025</span>
-            </div>
-            <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">B.S. Computer Science &amp; Engineering</div>
-            <p style="margin:20px 0 0;font:400 13.5px/1.85 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68);text-wrap:pretty">GPA 3.2 / 4.0. Relevant coursework: Databases, Software Engineering, Operating Systems, Algorithms and Networking.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="projects-en" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 76px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">03 — Projects</div>
-        <div class="section-content section-stack" style="max-width:640px;display:flex;flex-direction:column;gap:52px">
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(24px,2.8vw,32px)/1.22 'Instrument Serif',Georgia,serif;text-wrap:pretty">Sports &amp; Exercise Management System</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.4);white-space:nowrap">01</span>
-            </div>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Backend &amp; data engineering lead</div>
-            <div style="font:400 11px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45);margin-top:5px">Capstone project · 3-person team</div>
-            <ul class="bullet-list" style="margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Designed and implemented 15+ REST endpoints managing users, workouts and performance metrics.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Modeled and normalized the PostgreSQL schema to third normal form, cutting redundancy and protecting data integrity.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Indexing and optimized queries improved reporting performance by roughly <em style="font-style:normal;color:#16150f">30%</em>.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Integrated an LLM-powered chatbot enabling natural-language querying of structured relational data.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Deployed the full system to Heroku with migrations and per-environment configuration.</span></li>
-            </ul>
-            <div class="tag-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:18px"><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Python</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Flask</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">PostgreSQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">SQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Streamlit</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Ollama 3.1</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Heroku</span></div>
-          </div>
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(24px,2.8vw,32px)/1.22 'Instrument Serif',Georgia,serif;text-wrap:pretty">NBA Relational Database Analysis</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.4);white-space:nowrap">02</span>
-            </div>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Data modeling &amp; advanced SQL</div>
-            <div style="font:400 11px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45);margin-top:5px">Personal project</div>
-            <ul class="bullet-list" style="margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Designed a multi-season PostgreSQL relational database supporting complex statistical reporting.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Applied normalization, foreign-key constraints and schema optimization to maintain referential integrity.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Developed advanced queries using joins, aggregations and subqueries for performance metrics.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Ran structured data validation to guarantee analytical accuracy.</span></li>
-            </ul>
-            <div class="tag-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:18px"><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">PostgreSQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">SQL</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Python</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Git</span></div>
-          </div>
-          <div data-reveal>
-            <div class="entry-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-              <h3 style="margin:0;font:400 clamp(24px,2.8vw,32px)/1.22 'Instrument Serif',Georgia,serif;text-wrap:pretty">Gamified Gym</h3>
-              <span style="font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(22,21,15,.4);white-space:nowrap">03</span>
-            </div>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#e51a0d;margin-top:12px">Full-stack mobile developer</div>
-            <div style="font:400 11px/1.6 'IBM Plex Mono',monospace;color:rgba(22,21,15,.45);margin-top:5px">Software design project · 27-person team</div>
-            <ul class="bullet-list" style="margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.68)">
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Built a React Native mobile application following Clean Architecture and SOLID principles.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Modeled domain entities and bounded contexts to separate presentation, business logic and data.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Integrated Supabase authentication and database services, including role-protected navigation.</span></li>
-              <li style="display:grid;grid-template-columns:16px 1fr;gap:4px"><span style="color:#e51a0d">—</span><span style="text-wrap:pretty">Translated Figma designs into reusable components across several product modules.</span></li>
-            </ul>
-            <div class="tag-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:18px"><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">React Native</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Expo</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Supabase</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">JavaScript</span><span style="padding:6px 10px;border:1px solid rgba(22,21,15,.16);font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(22,21,15,.6)">Figma</span></div>
-          </div>
-          <div data-reveal>
-            <div style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,15,.45);margin-bottom:4px">Also</div>
-            <div style="display:flex;flex-direction:column;gap:6px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 19px/1.3 'Instrument Serif',Georgia,serif">EconQuest — Role-based learning platform</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Modular backend architecture with access control for admins, students and teachers. I led the student module: secure authentication, transactional database operations and engagement dashboards. 25+ person team under Scrum.</p>
-              <div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.08em;color:rgba(22,21,15,.42);margin-top:2px">Python · Flask · PostgreSQL · Heroku</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:6px;padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
-              <div style="font:400 19px/1.3 'Instrument Serif',Georgia,serif">RegiUPR — University enrollment system</div>
-              <p style="margin:0;font:400 12.5px/1.75 'IBM Plex Mono',monospace;color:rgba(22,21,15,.62);text-wrap:pretty">Desktop course-enrollment system built by a 22-person Agile team. I implemented user registration, input validation and account recovery, plus the logic enforcing business rules.</p>
-              <div style="font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.08em;color:rgba(22,21,15,.42);margin-top:2px">Python · PyQt5 · Figma · Git</div>
-            </div>
-          </div>
-          <div data-reveal style="border-top:1px solid rgba(22,21,15,.14);padding-top:22px"><a href="https://github.com/christianmedina-dev" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:9px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase">All the code on GitHub<span style="color:#e51a0d">↗</span></a></div>
-        </div>
-      </section>
-
-      <section id="contact-en" class="content-section" style="border-top:1px solid rgba(22,21,15,.14);padding:64px 0 30px;display:grid;grid-template-columns:150px 1fr;gap:40px;scroll-margin-top:80px">
-        <div data-reveal style="font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,15,.45)">04 — Contact</div>
-        <div class="section-content" style="max-width:640px">
-          <p data-reveal style="margin:0;font:400 clamp(26px,3.4vw,40px)/1.3 'Instrument Serif',Georgia,serif;text-wrap:pretty">Open to roles in <em>Data Engineering</em>, backend and Cloud — remote preferred.</p>
-          <div class="contact-links" data-reveal style="margin-top:34px;display:flex;flex-direction:column">
-            <a href="mailto:cjmedina99@gmail.com" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-top:1px solid rgba(22,21,15,.14);font:400 15px/1 'IBM Plex Mono',monospace;transition:padding-left .4s cubic-bezier(.2,.8,.2,1)" style-hover="padding-left:10px">cjmedina99@gmail.com<span style="color:#e51a0d">↗</span></a>
-            <a href="https://linkedin.com/in/christian-medina-1a1796198/" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-top:1px solid rgba(22,21,15,.14);font:400 15px/1 'IBM Plex Mono',monospace;transition:padding-left .4s cubic-bezier(.2,.8,.2,1)" style-hover="padding-left:10px">LinkedIn<span style="color:#e51a0d">↗</span></a>
-            <a href="https://github.com/christianmedina-dev" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-top:1px solid rgba(22,21,15,.14);border-bottom:1px solid rgba(22,21,15,.14);font:400 15px/1 'IBM Plex Mono',monospace;transition:padding-left .4s cubic-bezier(.2,.8,.2,1)" style-hover="padding-left:10px">GitHub<span style="color:#e51a0d">↗</span></a>
-          </div>
-        </div>
-      </section>
+<div class="mobile-sheet" id="mobileSheet" aria-hidden="true">
+  <button class="close-menu" id="closeMenu" aria-label="Close navigation">×</button>
+  <div class="mobile-sheet-inner">
+    <nav data-mobile-es>
+      <a href="#about">Sobre mí</a>
+      <a href="#work">Trayectoria</a>
+      <a href="#projects">Proyectos</a>
+      <a href="#contact">Contacto</a>
+    </nav>
+    <nav data-mobile-en hidden>
+      <a href="#about-en">About</a>
+      <a href="#work-en">Experience</a>
+      <a href="#projects-en">Projects</a>
+      <a href="#contact-en">Contact</a>
+    </nav>
+    <div class="mobile-lang">
+      <button data-lang="es">ES</button><span>/</span><button data-lang="en">EN</button>
     </div>
-
-    <footer class="site-footer" style="padding:40px 0 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font:400 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,15,.42)">
-      <span>© 2026 Christian J. Medina Díaz</span>
-      <span>{{ footNote }}</span>
-    </footer>
-
-  </main>
+  </div>
 </div>
 
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
-class Component extends DCLogic {
-  state = { lang: 'es' };
-  bar = React.createRef();
+<main id="top">
 
-  componentDidMount() {
-    try {
-      const saved = localStorage.getItem('cjm-lang');
-      if (saved === 'en' || saved === 'es') this.setState({ lang: saved });
-    } catch (e) {}
-    this.onScroll = () => {
-      const y = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (this.bar.current) this.bar.current.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-      document.querySelectorAll('[data-parallax]').forEach(el => {
-        el.style.transform = 'translate3d(0,' + (y * parseFloat(el.dataset.parallax)).toFixed(2) + 'px,0)';
-      });
-      if (this.sweep) this.sweep();
-    };
-    window.addEventListener('scroll', this.onScroll, { passive: true });
-    this.setupMotion();
-  }
+<section class="hero">
+  <div>
+    <div data-es>
+      <div class="eyebrow">Software Engineer · Data &amp; Cloud</div>
+      <h1>Sistemas de datos<br><em>que escalan.</em></h1>
+      <p class="hero-copy">Backend, bases de datos relacionales y pipelines de datos en la nube. Trabajo con más de cinco millones de registros — de la ingesta al dashboard.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="cv/Christian-Medina-CV.pdf" download>Descargar CV ↓</a>
+        <a class="btn btn-outline" href="mailto:cjmedina99@gmail.com">Escríbeme</a>
+        <a class="btn btn-link" href="#projects">Ver proyectos ↓</a>
+      </div>
+      <div class="status"><span class="status-dot"></span>San Juan, Puerto Rico · Disponible para posiciones remotas</div>
+    </div>
+    <div data-en hidden>
+      <div class="eyebrow">Software Engineer · Data &amp; Cloud</div>
+      <h1>Data systems<br><em>built to scale.</em></h1>
+      <p class="hero-copy">Backend, relational databases and cloud data pipelines. I work with datasets of five million-plus records — from ingestion to dashboard.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="cv/Christian-Medina-CV.pdf" download>Download CV ↓</a>
+        <a class="btn btn-outline" href="mailto:cjmedina99@gmail.com">Get in touch</a>
+        <a class="btn btn-link" href="#projects-en">See projects ↓</a>
+      </div>
+      <div class="status"><span class="status-dot"></span>San Juan, Puerto Rico · Open to remote roles</div>
+    </div>
+  </div>
+  <div class="portrait"><img src="portrait.webp" alt="Christian J. Medina Díaz"></div>
+</section>
 
-  componentDidUpdate(_p, prev) {
-    if (prev.lang !== this.state.lang) this.setupMotion();
-  }
+<div data-es>
+<section id="about" class="section">
+  <div class="section-label">01 — Sobre mí</div>
+  <div class="section-body">
+    <p class="lead">Me interesa el momento en que un sistema deja de <em>soportar</em> los datos y empieza a aprovecharlos.</p>
+    <p class="body-copy first">Soy Software Engineer, egresado de la Universidad de Puerto Rico, Recinto de Mayagüez. Mi trabajo vive en el backend: diseñar el esquema correcto, escribir la consulta que corre en segundos en vez de minutos, y mover los datos desde la ingesta hasta el dashboard sin que se rompan en el camino.</p>
+    <p class="body-copy">Hoy, en Innovatio, trabajo con conjuntos de datos de más de cinco millones de registros en AWS, cuidando rendimiento, escalabilidad y costo. También construyo la capa de reportería y visualización en Power BI, QuickSight y Streamlit — porque un pipeline solo vale lo que vale la decisión que habilita.</p>
+    <p class="body-copy">Antes de eso trabajé en proyectos con equipos de 22 a 27 personas bajo metodología Agile, donde aprendí lo que ningún curso enseña: la parte difícil de un sistema casi nunca es el código, es ponerse de acuerdo en qué significa cada dato. Busco un equipo <span style="color:#e51a0d">remoto</span> donde seguir creciendo en ingeniería de datos y arquitectura en la nube — y donde lo que construya se use de verdad.</p>
+    <div class="skills">
+      <div class="skill-row"><span class="skill-label">Lenguajes</span><span>Python · SQL · Java · JavaScript · C/C++</span></div>
+      <div class="skill-row"><span class="skill-label">Nube y datos</span><span>AWS (S3, Athena, RDS, QuickSight) · Pipelines de datos</span></div>
+      <div class="skill-row"><span class="skill-label">BI y analítica</span><span>Power BI · QuickSight · Streamlit · Matplotlib</span></div>
+      <div class="skill-row"><span class="skill-label">Bases de datos</span><span>PostgreSQL · MySQL · Modelado 3NF · Indexación · Optimización</span></div>
+      <div class="skill-row"><span class="skill-label">Backend</span><span>Flask · APIs REST · Arquitectura limpia · SOLID · Agile</span></div>
+    </div>
+  </div>
+</section>
 
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScroll);
-    if (this.io) this.io.disconnect();
-  }
+<section id="work" class="section">
+  <div class="section-label">02 — Trayectoria</div>
+  <div class="section-body entry-stack">
+    <article>
+      <div class="entry-head">
+        <h3 class="entry-title">Innovatio Software Solutions</h3>
+        <span class="entry-date">2026 — hoy</span>
+      </div>
+      <div class="role">Ingeniero de Software · Contratista independiente</div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-value">5M+</div><div class="metric-label">Registros procesados</div></div>
+        <div class="metric"><div class="metric-value">min → seg</div><div class="metric-label">Tiempo de ingesta</div></div>
+      </div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Rediseñé la ingesta de <strong style="font-weight:400;color:#16150f">volcado completo a refresco incremental</strong>, bajando el tiempo de corrida de minutos a segundos y aliviando la carga sobre la base de datos.</span></li>
+        <li><span class="dash">—</span><span>Optimicé almacenamiento y consultas para reducir de forma sostenida el costo de operación del pipeline, eliminando trabajo redundante en cada corrida.</span></li>
+        <li><span class="dash">—</span><span>Pipelines de extremo a extremo sobre AWS (S3, Athena, RDS) para más de 5 millones de registros, con foco en rendimiento, escalabilidad y costo.</span></li>
+        <li><span class="dash">—</span><span>Consultas SQL optimizadas y dashboards en Power BI y QuickSight para decisiones de negocio.</span></li>
+      </ul>
+      <div style="margin-top:26px"><a class="btn btn-outline" href="ensayo.html">Leer el ensayo técnico ↗</a></div>
+    </article>
 
-  pick(lang) {
-    try { localStorage.setItem('cjm-lang', lang); } catch (e) {}
-    this.setState({ lang: lang });
-  }
+    <article>
+      <div class="entry-head">
+        <h3 class="entry-title">Universidad de Puerto Rico,<br>Recinto de Mayagüez</h3>
+        <span class="entry-date">Dic. 2025</span>
+      </div>
+      <div class="role">B.S. Ciencias e Ingeniería de Computación</div>
+      <p class="body-copy">GPA 3.2 / 4.0. Cursos relevantes: Bases de Datos, Ingeniería de Software, Sistemas Operativos, Algoritmos y Redes.</p>
+    </article>
+  </div>
+</section>
 
-  setupMotion() {
-    const ease = 'opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1)';
-    document.querySelectorAll('[data-anim]').forEach(el => {
-      el.style.animation = 'cmRise .95s cubic-bezier(.2,.8,.2,1) both';
-      el.style.animationDelay = (parseInt(el.dataset.anim, 10) * 0.09) + 's';
+<section id="projects" class="section">
+  <div class="section-label">03 — Proyectos</div>
+  <div class="section-body entry-stack">
+    <article>
+      <div class="entry-head"><h3 class="entry-title">Sports &amp; Exercise Management System</h3><span class="entry-date">01</span></div>
+      <div class="role">Líder de backend e ingeniería de datos</div>
+      <div class="meta">Proyecto de capstone · equipo de 3 personas</div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Diseñé e implementé más de 15 endpoints REST para gestionar usuarios, rutinas y métricas de rendimiento.</span></li>
+        <li><span class="dash">—</span><span>Modelé y normalicé el esquema de PostgreSQL a tercera forma normal, reduciendo redundancia y protegiendo la integridad de los datos.</span></li>
+        <li><span class="dash">—</span><span>Con indexación y consultas optimizadas mejoré el rendimiento de la reportería en aproximadamente 30%.</span></li>
+        <li><span class="dash">—</span><span>Integré un chatbot con modelo de lenguaje que permite consultar datos relacionales en lenguaje natural.</span></li>
+        <li><span class="dash">—</span><span>Desplegué el sistema completo en Heroku con migraciones y configuración por ambiente.</span></li>
+      </ul>
+      <div class="tags"><span class="tag">Python</span><span class="tag">Flask</span><span class="tag">PostgreSQL</span><span class="tag">SQL</span><span class="tag">Streamlit</span><span class="tag">Ollama 3.1</span><span class="tag">Heroku</span></div>
+    </article>
+
+    <article>
+      <div class="entry-head"><h3 class="entry-title">NBA Relational Database Analysis</h3><span class="entry-date">02</span></div>
+      <div class="role">Modelado de datos y SQL avanzado</div>
+      <div class="meta">Proyecto personal</div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Diseñé una base de datos relacional multi-temporada en PostgreSQL para análisis estadístico complejo.</span></li>
+        <li><span class="dash">—</span><span>Apliqué normalización, llaves foráneas y optimización de esquema para mantener la integridad referencial.</span></li>
+        <li><span class="dash">—</span><span>Desarrollé consultas avanzadas con uniones, agregaciones y subconsultas para métricas de rendimiento.</span></li>
+        <li><span class="dash">—</span><span>Ejecuté validación estructurada de datos para garantizar exactitud analítica.</span></li>
+      </ul>
+      <div class="tags"><span class="tag">PostgreSQL</span><span class="tag">SQL</span><span class="tag">Python</span><span class="tag">Git</span></div>
+    </article>
+
+    <article>
+      <div class="entry-head"><h3 class="entry-title">Gamified Gym</h3><span class="entry-date">03</span></div>
+      <div class="role">Desarrollador full-stack móvil</div>
+      <div class="meta">Proyecto de diseño de software · equipo de 27 personas</div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Construí una aplicación móvil en React Native siguiendo arquitectura limpia y principios SOLID.</span></li>
+        <li><span class="dash">—</span><span>Modelé entidades de dominio y contextos delimitados para separar presentación, lógica de negocio y datos.</span></li>
+        <li><span class="dash">—</span><span>Integré autenticación y servicios de base de datos con Supabase, incluyendo navegación protegida por rol.</span></li>
+        <li><span class="dash">—</span><span>Traduje diseños de Figma en componentes reutilizables para varios módulos del producto.</span></li>
+      </ul>
+      <div class="tags"><span class="tag">React Native</span><span class="tag">Expo</span><span class="tag">Supabase</span><span class="tag">JavaScript</span><span class="tag">Figma</span></div>
+    </article>
+
+    <article>
+      <div class="meta" style="text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px">También</div>
+      <div style="padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
+        <div style="font:400 19px/1.3 'Instrument Serif',Georgia,serif">EconQuest — Plataforma de aprendizaje con roles</div>
+        <p class="body-copy" style="font-size:12.5px">Arquitectura modular de backend con control de acceso para administradores, estudiantes y docentes. Lideré el módulo de estudiante: autenticación segura, operaciones transaccionales y dashboards de participación. Equipo de más de 25 personas bajo Scrum.</p>
+      </div>
+      <div style="padding:20px 0;border-top:1px solid rgba(22,21,15,.12)">
+        <div style="font:400 19px/1.3 'Instrument Serif',Georgia,serif">RegiUPR — Sistema de matrícula universitaria</div>
+        <p class="body-copy" style="font-size:12.5px">Sistema de escritorio para matrícula de cursos desarrollado en un equipo Agile de 22 personas. Implementé registro de usuarios, validación de entradas y recuperación de cuentas, además de la lógica que hace cumplir las reglas de negocio.</p>
+      </div>
+      <div style="border-top:1px solid var(--line);padding-top:22px"><a href="https://github.com/christianmedina-dev" target="_blank" rel="noopener" class="btn btn-link">Todo el código en GitHub ↗</a></div>
+    </article>
+  </div>
+</section>
+
+<section id="contact" class="section">
+  <div class="section-label">04 — Contacto</div>
+  <div class="section-body">
+    <p class="lead">Abierto a posiciones en <em>ingeniería de datos</em>, backend y nube — con preferencia por equipos <em>remotos</em>.</p>
+    <div class="contact-links">
+      <a href="mailto:cjmedina99@gmail.com">cjmedina99@gmail.com<span style="color:#e51a0d">↗</span></a>
+      <a href="https://linkedin.com/in/christian-medina-1a1796198/" target="_blank" rel="noopener">LinkedIn<span style="color:#e51a0d">↗</span></a>
+      <a href="https://github.com/christianmedina-dev" target="_blank" rel="noopener">GitHub<span style="color:#e51a0d">↗</span></a>
+    </div>
+  </div>
+</section>
+</div>
+
+<div data-en hidden>
+<section id="about-en" class="section">
+  <div class="section-label">01 — About</div>
+  <div class="section-body">
+    <p class="lead">What interests me is the moment a system stops merely <em>holding</em> data and starts making use of it.</p>
+    <p class="body-copy first">I'm a Software Engineer, a graduate of the University of Puerto Rico, Mayagüez Campus. My work lives in the backend: designing the right schema, writing the query that runs in seconds instead of minutes, and moving data from ingestion to dashboard without it breaking along the way.</p>
+    <p class="body-copy">Today, at Innovatio, I work with datasets of more than five million records on AWS, watching performance, scalability and cost. I've also built reporting and visualization in Power BI, QuickSight and Streamlit — because a pipeline is only worth the decision it enables.</p>
+    <p class="body-copy">Before that I shipped projects with 22- to 27-person Agile teams, where I learned what no course teaches: the hard part of a system is rarely the code — it's agreeing on what each piece of data means. I'm looking for a <span style="color:#e51a0d">remote</span> team where I can keep growing in Data Engineering and Cloud, and where what I build actually gets used.</p>
+    <div class="skills">
+      <div class="skill-row"><span class="skill-label">Languages</span><span>Python · SQL · Java · JavaScript · C/C++</span></div>
+      <div class="skill-row"><span class="skill-label">Cloud &amp; data</span><span>AWS (S3, Athena, QuickSight) · Data Pipelines</span></div>
+      <div class="skill-row"><span class="skill-label">BI &amp; analytics</span><span>Power BI · Streamlit · Matplotlib · Data validation</span></div>
+      <div class="skill-row"><span class="skill-label">Databases</span><span>PostgreSQL · MySQL · 3NF modeling · Indexing · Query tuning</span></div>
+      <div class="skill-row"><span class="skill-label">Backend</span><span>Flask · REST APIs · Clean Architecture · Agile</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="work-en" class="section">
+  <div class="section-label">02 — Experience</div>
+  <div class="section-body entry-stack">
+    <article>
+      <div class="entry-head"><h3 class="entry-title">Innovatio Software Solutions</h3><span class="entry-date">2026 — present</span></div>
+      <div class="role">Software Engineer · Independent contractor</div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-value">5M+</div><div class="metric-label">Records processed</div></div>
+        <div class="metric"><div class="metric-value">min → sec</div><div class="metric-label">Ingestion run time</div></div>
+      </div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Redesigned ingestion from full dump to incremental refresh, taking run time from minutes down to seconds and easing load on the database.</span></li>
+        <li><span class="dash">—</span><span>Optimized storage and queries to sustainably reduce the pipeline's operating cost by eliminating redundant work on every run.</span></li>
+        <li><span class="dash">—</span><span>End-to-end pipelines on AWS (S3, Athena, RDS) for 5M+ records, focused on performance, scalability and cost.</span></li>
+        <li><span class="dash">—</span><span>Optimized SQL queries and dashboards in Power BI and QuickSight for business decisions.</span></li>
+      </ul>
+      <div style="margin-top:26px"><a class="btn btn-outline" href="ensayo.html">Read the technical essay ↗</a></div>
+    </article>
+    <article>
+      <div class="entry-head"><h3 class="entry-title">University of Puerto Rico,<br>Mayagüez Campus</h3><span class="entry-date">Dec. 2025</span></div>
+      <div class="role">B.S. Computer Science &amp; Engineering</div>
+      <p class="body-copy">GPA 3.2 / 4.0. Relevant coursework: Databases, Software Engineering, Operating Systems, Algorithms and Networking.</p>
+    </article>
+  </div>
+</section>
+
+<section id="projects-en" class="section">
+  <div class="section-label">03 — Projects</div>
+  <div class="section-body entry-stack">
+    <article>
+      <div class="entry-head"><h3 class="entry-title">Sports &amp; Exercise Management System</h3><span class="entry-date">01</span></div>
+      <div class="role">Backend &amp; data engineering lead</div>
+      <div class="meta">Capstone project · 3-person team</div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Designed and implemented 15+ REST endpoints managing users, workouts and performance metrics.</span></li>
+        <li><span class="dash">—</span><span>Modeled and normalized the PostgreSQL schema to third normal form, cutting redundancy and protecting data integrity.</span></li>
+        <li><span class="dash">—</span><span>Indexing and optimized queries improved reporting performance by roughly 30%.</span></li>
+        <li><span class="dash">—</span><span>Integrated an LLM-powered chatbot enabling natural-language querying of structured relational data.</span></li>
+        <li><span class="dash">—</span><span>Deployed the full system to Heroku with migrations and per-environment configuration.</span></li>
+      </ul>
+      <div class="tags"><span class="tag">Python</span><span class="tag">Flask</span><span class="tag">PostgreSQL</span><span class="tag">SQL</span><span class="tag">Streamlit</span><span class="tag">Ollama 3.1</span><span class="tag">Heroku</span></div>
+    </article>
+    <article>
+      <div class="entry-head"><h3 class="entry-title">NBA Relational Database Analysis</h3><span class="entry-date">02</span></div>
+      <div class="role">Data modeling &amp; advanced SQL</div>
+      <div class="meta">Personal project</div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Designed a multi-season PostgreSQL relational database supporting complex statistical reporting.</span></li>
+        <li><span class="dash">—</span><span>Applied normalization, foreign-key constraints and schema optimization to maintain referential integrity.</span></li>
+        <li><span class="dash">—</span><span>Developed advanced queries using joins, aggregations and subqueries for performance metrics.</span></li>
+        <li><span class="dash">—</span><span>Ran structured data validation to guarantee analytical accuracy.</span></li>
+      </ul>
+      <div class="tags"><span class="tag">PostgreSQL</span><span class="tag">SQL</span><span class="tag">Python</span><span class="tag">Git</span></div>
+    </article>
+    <article>
+      <div class="entry-head"><h3 class="entry-title">Gamified Gym</h3><span class="entry-date">03</span></div>
+      <div class="role">Full-stack mobile developer</div>
+      <div class="meta">Software design project · 27-person team</div>
+      <ul class="bullets">
+        <li><span class="dash">—</span><span>Built a React Native mobile application following Clean Architecture and SOLID principles.</span></li>
+        <li><span class="dash">—</span><span>Modeled domain entities and bounded contexts to separate presentation, business logic and data.</span></li>
+        <li><span class="dash">—</span><span>Integrated Supabase authentication and database services, including role-protected navigation.</span></li>
+        <li><span class="dash">—</span><span>Translated Figma designs into reusable components across several product modules.</span></li>
+      </ul>
+      <div class="tags"><span class="tag">React Native</span><span class="tag">Expo</span><span class="tag">Supabase</span><span class="tag">JavaScript</span><span class="tag">Figma</span></div>
+    </article>
+  </div>
+</section>
+
+<section id="contact-en" class="section">
+  <div class="section-label">04 — Contact</div>
+  <div class="section-body">
+    <p class="lead">Open to roles in <em>Data Engineering</em>, backend and Cloud — remote preferred.</p>
+    <div class="contact-links">
+      <a href="mailto:cjmedina99@gmail.com">cjmedina99@gmail.com<span style="color:#e51a0d">↗</span></a>
+      <a href="https://linkedin.com/in/christian-medina-1a1796198/" target="_blank" rel="noopener">LinkedIn<span style="color:#e51a0d">↗</span></a>
+      <a href="https://github.com/christianmedina-dev" target="_blank" rel="noopener">GitHub<span style="color:#e51a0d">↗</span></a>
+    </div>
+  </div>
+</section>
+</div>
+
+<footer>
+  <span>© 2026 Christian J. Medina Díaz</span>
+  <span id="footNote">San Juan, PR · Remoto</span>
+</footer>
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const progress = document.getElementById('progress');
+  const mobileSheet = document.getElementById('mobileSheet');
+  const openMenu = document.getElementById('openMenu');
+  const closeMenu = document.getElementById('closeMenu');
+  const footNote = document.getElementById('footNote');
+
+  function setLang(lang){
+    const es = lang === 'es';
+    document.querySelectorAll('[data-es]').forEach(el => el.hidden = !es);
+    document.querySelectorAll('[data-en]').forEach(el => el.hidden = es);
+    document.querySelectorAll('[data-nav-es]').forEach(el => el.hidden = !es);
+    document.querySelectorAll('[data-nav-en]').forEach(el => el.hidden = es);
+    document.querySelectorAll('[data-mobile-es]').forEach(el => el.hidden = !es);
+    document.querySelectorAll('[data-mobile-en]').forEach(el => el.hidden = es);
+    document.querySelectorAll('[data-lang="es"]').forEach(el => {
+      el.style.color = es ? '#16150f' : 'rgba(22,21,15,.4)';
+      el.style.textDecoration = es ? 'underline' : 'none';
+      el.style.textUnderlineOffset = '4px';
+      el.style.textDecorationColor = es ? '#e51a0d' : 'transparent';
     });
-    if (this.io) { this.io.disconnect(); this.io = null; }
-
-    const show = el => {
-      el.dataset.revealed = '1';
-      el.style.opacity = '1';
-      el.style.transform = 'none';
-    };
-    const inView = el => {
-      const r = el.getBoundingClientRect();
-      return r.top < window.innerHeight * 0.95 && r.bottom > -40;
-    };
-    const els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
-
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      els.forEach(show);
-      this.sweep = null;
-      requestAnimationFrame(() => this.onScroll && this.onScroll());
-      return;
-    }
-
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        show(e.target);
-        io.unobserve(e.target);
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
-    this.io = io;
-
-    els.forEach((el, i) => {
-      if (el.dataset.revealed || inView(el)) { show(el); return; }
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(22px)';
-      el.style.transition = ease;
-      el.style.transitionDelay = ((i % 4) * 0.07) + 's';
-      io.observe(el);
+    document.querySelectorAll('[data-lang="en"]').forEach(el => {
+      el.style.color = es ? 'rgba(22,21,15,.4)' : '#16150f';
+      el.style.textDecoration = es ? 'none' : 'underline';
+      el.style.textUnderlineOffset = '4px';
+      el.style.textDecorationColor = es ? 'transparent' : '#e51a0d';
     });
-
-    // red de seguridad: si el observer falla, nada queda invisible
-    this.sweep = () => els.forEach(el => { if (!el.dataset.revealed && inView(el)) show(el); });
-    setTimeout(() => this.sweep && this.sweep(), 1200);
-    requestAnimationFrame(() => this.onScroll && this.onScroll());
+    root.lang = lang;
+    footNote.textContent = es ? 'San Juan, PR · Remoto' : 'San Juan, PR · Remote';
+    try { localStorage.setItem('cjm-lang', lang); } catch(e){}
+    closeMobile();
   }
 
-  renderVals() {
-    const es = this.state.lang === 'es';
-    return {
-      bar: this.bar,
-      photoPh: es ? 'Tu foto · 4:5' : 'Your photo · 4:5',
-      photoCap: es ? 'Arrastra tu foto aquí' : 'Drag your photo here',
-      footNote: es ? 'San Juan, PR · Remoto' : 'San Juan, PR · Remote',
-      dEs: es ? 'block' : 'none',
-      dEn: es ? 'none' : 'block',
-      cEs: es ? '#16150f' : 'rgba(22,21,15,.4)',
-      cEn: es ? 'rgba(22,21,15,.4)' : '#16150f',
-      uEs: es ? '#e51a0d' : 'transparent',
-      uEn: es ? 'transparent' : '#e51a0d',
-      setEs: () => this.pick('es'),
-      setEn: () => this.pick('en')
-    };
+  function openMobile(){
+    mobileSheet.classList.add('open');
+    mobileSheet.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
   }
-}
+  function closeMobile(){
+    mobileSheet.classList.remove('open');
+    mobileSheet.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  }
+
+  openMenu.addEventListener('click', openMobile);
+  closeMenu.addEventListener('click', closeMobile);
+  mobileSheet.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobile));
+  document.querySelectorAll('[data-lang]').forEach(btn => btn.addEventListener('click', () => setLang(btn.dataset.lang)));
+
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+  }, {passive:true});
+
+  let lang='es';
+  try {
+    const saved = localStorage.getItem('cjm-lang');
+    if(saved === 'es' || saved === 'en') lang=saved;
+  } catch(e){}
+  setLang(lang);
+})();
 </script>
 </body>
 </html>
